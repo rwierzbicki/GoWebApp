@@ -17,10 +17,12 @@ Use the `--save` option to add the package to the package.json file
 #### File Tree
 
 ```
-├── /client                   # client-side
+├── /client
 │   ├── /assets               # resources like images
-│   └── /public               # use for static files like html, js, etc
-├── /server                   # server-side
+│   ├── /html
+│   ├── /css
+│   └── /javascript
+├── /server
 ├── README.md                 # this file!
 ├── package.json              # keeps track of Node packages
 └── .gitignore                # files that don't need to be tracked by git
