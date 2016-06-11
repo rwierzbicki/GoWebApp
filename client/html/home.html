@@ -14,32 +14,95 @@
     <!-- Bootstrap theme -->
     <link href="css/bootstrap-theme.min.css" rel="stylesheet">
 
-    <style type="text/css">
-		.nav.pull-right {
-		    float: right;
-		    margin-right: 98px;
-		}
-	</style>
+    <link href="/css/home.css" rel="stylesheet"/>
     
-  </head>
+  	</head>
+
   	<body>
-  		<!-- navigation bar -->
-	  	<nav class="navbar navbar-default">
-	  		<div class="container">
-	  			<div id="navbar" class="navbar-collapse collapse">
-		          	<ul class="nav navbar-nav pull-right">
-		            	<li><a href="#login">Login</a></li>
-		          	</ul>
-		        </div>
-	  		</div>
-	  	</nav>
+	  	
+	  	<!--=============================== HOME PAGE =================================-->
+	  	<div id="home-page">
 
-	  	<div class="container theme-showcase" role="main">
+			<!-- navigation bar -->
+		  	<nav class="navbar navbar-default">
+		  		<div class="container">
+		  			<div id="navbar" class="navbar-collapse collapse">
+			          	<ul class="nav navbar-nav pull-right">
+			            	<li><a  href="#login" class="login-button">Login</a></li>
+			          	</ul>
+			        </div>
+		  		</div>
+		  	</nav>
 
-		    <h1>The Game of Go</h1>
-		    <a href="new_game.html" class="btn btn-lg btn-default">Play</a>
-	
+		  	<div class="container theme-showcase" role="main">
+
+			    <h1>The Game of Go</h1>
+			    <a href="#new-game" class="btn btn-lg btn-default new-game-button">Play</a>
+		
+		    </div>
 	    </div>
+
+		<!--============================= GAME SETUP PAGE =============================-->
+	    <div id="game-setup-page">
+
+		    <!-- navigation bar -->
+		  	<nav class="navbar navbar-default">
+		  		<div class="container">
+			  		<div class="navbar-header">
+			          	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				            <span class="sr-only">Toggle navigation</span>
+				            <span class="icon-bar"></span>
+				            <span class="icon-bar"></span>
+				            <span class="icon-bar"></span>
+			         	</button>
+			         	<a class="navbar-brand home-button" href="#home">Go Online</a>
+		       		</div>
+		  			<div id="navbar" class="navbar-collapse collapse">
+			          	<ul class="nav navbar-nav pull-right">
+			            	<li><a href="#login" class="login-button">Login</a></li>
+			          	</ul>
+			        </div>
+		  		</div>
+		  	</nav>
+
+		  	<div class="container theme-showcase" role="main">
+				<h1>New Game</h1>
+				<br>
+
+				<p><b>Board size</b></p>
+				<div class="btn-group" data-toggle="buttons">
+					<label id='btn_boardSize9' class="btn btn-default">
+						<input type="radio" name="options2" id="radio_boardSize9" autocomplete="off"> 9x9
+					</label>
+					<label id='btn_boardSize13' class="btn btn-default active">
+						<input type="radio" name="options2" id="radio_boardSize13" autocomplete="off" checked> 13x13
+					</label>
+					<label id='btn_boardSize15' class="btn btn-default">
+						<input type="radio" name="options2" id="radio_boardSize15" autocomplete="off"> 15x15
+					</label>
+				</div>
+				<br><br>
+
+				<p><b>Play mode</b></p>
+				<div class="btn-group" data-toggle="buttons">
+					<label class="btn btn-default active">
+						<input type="radio" name="options" id="option1" autocomplete="off" checked> Local Multiplayer
+					</label>
+					<label class="btn btn-default">
+						<input type="radio" name="options" id="option2" autocomplete="off"> 1 Player
+					</label>
+				</div>
+		    </div>
+
+	    </div>
+
+	    <!-- Bootstrap core JavaScript
+	    ================================================== -->
+	    <!-- Placed at the end of the document so the pages load faster -->
+	    <script src="js/jquery.min.js"></script>
+	    <script src="js/bootstrap.min.js"></script>
+
+	    <script src="javascript/home.js"></script>
 
   	</body>
 </html>
