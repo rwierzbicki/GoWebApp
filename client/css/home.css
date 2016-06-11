@@ -10,3 +10,21 @@
     float: right;
     margin-right: 98px;
 }
+
+.token-image {
+    width: 50px;
+    margin: 26px;
+    position: absolute;
+}
+
+.token-image.unplaced {
+    opacity: 0;
+}
+
+.token-image.unplaced:hover {
+    opacity: 0.3;
+}
+
+.token-image.placed {
+    opacity: 1;
+}
