@@ -1,3 +1,5 @@
+// Constants
+
 PLAYER_1 = 1;
 PLAYER_2 = 2;
 
@@ -13,50 +15,69 @@ TOKEN_IMGS = {
 PLAYER_1_TOKEN = TOKEN_IMGS.raccoon;
 PLAYER_2_TOKEN = TOKEN_IMGS.fox;
 
-var boardSizePixels;
-var boardSize;
-var hotseat = true;
+// Variables
+
+var board = {
+	size: 0,
+	realSize: 600,
+	sqSize: 0,
+	hotseat: true,	// TODO: get from game options
+	setSize: function(sizeValue){
+		this.size = sizeValue;
+		this.sqSize = this.realSize / (this.size + 1);
+	}
+};
+
 var currPlayer;
 
 /*
-* @param {container} the element in which the board will be created
-* @param {size} the dimensions of the board (# of rows/columns)
-* @param (realSize} the dimensions of the board in pixels
+* @param container {div DOM} the element in which the board will be created
 */
-function setupGame(container, size, realSize) {
-	var gameboard = container;
-	boardSize = size;
-	boardSizePixels = realSize;
+function renderNewGameBoard(container) {
+	var svg = makeGameBoard();
+	
+	// tokens
+    for (var row = 0; row < (board.size); row++) {
+    	for (var col = 0; col < (board.size); col++) {
+    		svg.append(makeToken(col, row, board.sqSize, PLAYER_1_TOKEN, "token-image unplaced", onClickToken));
+    	}
+    }
 
-	var svg = $(makeSVG(boardSizePixels, boardSizePixels));
+	container.append(svg);
+};
+
+// TODO: implement
+function renderHistoryGameBoard() {}
+
+// TODO implement
+function renderUnfinishedGameBoard() {}
+
+function makeGameBoard() {
+	var size = board.size;
+	var realSize = board.realSize;
+
+	var svg = $(makeSVG(realSize, realSize));
 
 	currPlayer = PLAYER_1;
 
-	var sqSize = boardSizePixels/(boardSize+1);
-    var tokenSize = sqSize;
+	//var sqSize = realSize/(size+1);
+	var sqSize = board.sqSize;
 
     // rectangles
-    for (var row = 0; row < (boardSize+1); row++) {
-    	for (var col = 0; col < (boardSize+1); col++) {
+    for (var row = 0; row < (size+1); row++) {
+    	for (var col = 0; col < (size+1); col++) {
     		svg.append(makeSquare(col*sqSize, row*sqSize, sqSize));
     	}
     }
 
-    // tokens
-    for (var row = 0; row < (boardSize); row++) {
-    	for (var col = 0; col < (boardSize); col++) {
-    		svg.append(makeToken(col*sqSize+sqSize/2, row*sqSize+sqSize/2, col, row, tokenSize, PLAYER_1_TOKEN, onClickToken));
-    	}
-    }
-
-	gameboard.append(svg);
-};
+    return svg;
+}
 
 function onClickToken(event) {
 	var token = event.target;
 	token.setAttributeNS(null, "class", "token-image placed");
 	
-	if (hotseat) {
+	if (board.hotseat) {
 		if (currPlayer == PLAYER_1) {
 			currPlayer = PLAYER_2;
 			var imgPath = PLAYER_2_TOKEN;

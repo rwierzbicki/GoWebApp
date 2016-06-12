@@ -55,9 +55,7 @@ function makeSquare(x, y, length){
 	square.setAttribute("y", y);
 	square.setAttribute("width", length);
 	square.setAttribute("height", length);
-  //square.style.fill = "BurlyWood";
 	square.style.fill = "#f5e3d6";
-  // square.style.stroke = '#ce954b';
 	square.style.stroke = '#eac8ae';
 	square.style.strokeWidth = 2;
 
@@ -67,28 +65,27 @@ function makeSquare(x, y, length){
 /**
 * Makes and returns a new SVG token object. 
 * 
-* @param x {number} the x position in pixels of the token.
-* @param y {number} the y position in pixels of the token.
 * @param X {number} the x coordinate of the token on the Go board.
 * @param Y {number} the y coordinate of the token on the Go board.
 * @param w {number} the width of the image (assumes a square image)
 * @param src {number} the source of the image file for the token
+* @param className {string} class name
 * @param onClick {function} the function to call on a click event
 * 
 * @return {object} 
 */
-function makeToken(x, y, X, Y, w, src, onClick){
+function makeToken(X, Y, w, src, className, onClick=null){
 
   var token = document.createElementNS('http://www.w3.org/2000/svg','image');
 
   token.setAttributeNS('http://www.w3.org/1999/xlink','href', src);
-  token.setAttributeNS(null, "x", x);
-  token.setAttributeNS(null, "y", y);
-  token.setAttributeNS(null, "X", X);
-  token.setAttributeNS(null, "Y", Y);
-  token.setAttributeNS(null, "width", w);
-  token.setAttributeNS(null, "height", w);
-  token.setAttributeNS(null, "class", "token-image unplaced");
+  token.setAttribute("x", X*w+w/2);
+  token.setAttribute("y", Y*w+w/2);
+  token.setAttribute("X", X);
+  token.setAttribute("Y", Y);
+  token.setAttribute("width", w);
+  token.setAttribute("height", w);
+  token.setAttribute("class", className);
   token.onclick = onClick;
 
   return token;
