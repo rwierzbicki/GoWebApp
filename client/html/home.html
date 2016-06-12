@@ -22,40 +22,44 @@
 
 	  	<!--============================== HOME NAVBAR ================================-->
 
-	  	<nav id="home-navbar" class="navbar navbar-default">
-	  		<div class="container">
-	  			<div id="navbar" class="navbar-collapse collapse">
-		          	<ul class="nav navbar-nav pull-right">
-		            	<li><a  href="#login" class="login-button">Login</a></li>
-		          	</ul>
-		        </div>
-	  		</div>
-	  	</nav>
+	  	<div id="home-navbar" class="page-section">
+		  	<nav class="navbar navbar-default">
+		  		<div class="container">
+		  			<div id="navbar" class="navbar-collapse collapse">
+			          	<ul class="nav navbar-nav pull-right">
+			            	<li><a  href="#login" class="login-button">Login</a></li>
+			          	</ul>
+			        </div>
+		  		</div>
+		  	</nav>
+		</div>
 
 	  	<!--============================= OTHER NAVBAR ================================-->
 
-	  	<nav id="other-navbar" class="navbar navbar-default initially-hidden">
-	  		<div class="container">
-		  		<div class="navbar-header">
-		          	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-			            <span class="sr-only">Toggle navigation</span>
-			            <span class="icon-bar"></span>
-			            <span class="icon-bar"></span>
-			            <span class="icon-bar"></span>
-		         	</button>
-		         	<a class="navbar-brand home-button" href="#home">Go Online</a>
-	       		</div>
-	  			<div id="navbar" class="navbar-collapse collapse">
-		          	<ul class="nav navbar-nav pull-right">
-		            	<li><a href="#login" class="login-button">Login</a></li>
-		          	</ul>
-		        </div>
-	  		</div>
-	  	</nav>
+	  	<div id="other-navbar" class="page-section initially-hidden">
+		  	<nav class="navbar navbar-default">
+		  		<div class="container">
+			  		<div class="navbar-header">
+			          	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				            <span class="sr-only">Toggle navigation</span>
+				            <span class="icon-bar"></span>
+				            <span class="icon-bar"></span>
+				            <span class="icon-bar"></span>
+			         	</button>
+			         	<a class="navbar-brand home-button" href="#home">Go Online</a>
+		       		</div>
+		  			<div id="navbar" class="navbar-collapse collapse">
+			          	<ul class="nav navbar-nav pull-right">
+			            	<li><a href="#login" class="login-button">Login</a></li>
+			          	</ul>
+			        </div>
+		  		</div>
+		  	</nav>
+	  	</div>
 
 	  	<!--=============================== HOME PAGE =================================-->
 
-	  	<div id="home-page">
+	  	<div id="home-page" class="page-section">
 		  	<div class="container theme-showcase" role="main">
 			    <h1>The Game of Go</h1>
 			    <a href="#new-game" class="btn btn-lg btn-default new-game-button">Play</a>
@@ -64,7 +68,7 @@
 
 		<!--============================= GAME SETUP PAGE =============================-->
 
-	    <div id="game-setup-page" class="initially-hidden">
+	    <div id="game-setup-page" class="page-section initially-hidden">
 		  	<div class="container theme-showcase" role="main">
 				<h1>New Game</h1>
 				<br>
@@ -103,7 +107,7 @@
 
 	    <!--================================== GAME PAGE ================================-->
 
-	    <div id="game-page" class="container initially-hidden">
+	    <div id="game-page" class="page-section initially-hidden container">
             <div id="gameboard"></div>
 	    </div>
 

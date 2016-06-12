@@ -8,29 +8,21 @@ window.onload = function() {
 }
 
 function renderHomePage() {
-	hidePages();
+	$('.initially-hidden').hide();
 	$('#home-navbar').show();
 	$('#home-page').show();
 }
 
 function renderNewGamePage() {
-	hidePages();
+	$('.page-section').hide();
 	$('#other-navbar').show();
 	$('#game-setup-page').show();
 }
 
 function renderGamePage() {
-	hidePages();
+	$('.page-section').hide();
 	$('#other-navbar').show();
 	$('#game-page').show();
-}
-
-function hidePages() {
-	$('#home-navbar').hide();
-	$('#other-navbar').hide();
-	$('#home-page').hide();
-	$('#game-setup-page').hide();
-	$('#game-page').hide();
 }
 
 function startGame() {
