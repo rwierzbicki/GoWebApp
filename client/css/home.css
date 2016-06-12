@@ -1,19 +1,14 @@
-#home-page {
-	
+.initially-hidden {
+	display: none;
 }
 
-#game-setup-page {
-
-}
-
+/* Right align navbar options excluding logo */
 .nav.pull-right {
     float: right;
     margin-right: 98px;
 }
 
 .token-image {
-    width: 50px;
-    margin: 26px;
     position: absolute;
 }
 

@@ -34,7 +34,7 @@
 
 	  	<!--============================= OTHER NAVBAR ================================-->
 
-	  	<nav id="other-navbar" class="navbar navbar-default">
+	  	<nav id="other-navbar" class="navbar navbar-default initially-hidden">
 	  		<div class="container">
 		  		<div class="navbar-header">
 		          	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -54,19 +54,17 @@
 	  	</nav>
 
 	  	<!--=============================== HOME PAGE =================================-->
+
 	  	<div id="home-page">
-
 		  	<div class="container theme-showcase" role="main">
-
 			    <h1>The Game of Go</h1>
 			    <a href="#new-game" class="btn btn-lg btn-default new-game-button">Play</a>
-		
 		    </div>
 	    </div>
 
 		<!--============================= GAME SETUP PAGE =============================-->
-	    <div id="game-setup-page">
 
+	    <div id="game-setup-page" class="initially-hidden">
 		  	<div class="container theme-showcase" role="main">
 				<h1>New Game</h1>
 				<br>
@@ -101,12 +99,11 @@
 					<input id="submit-options-button" class="btn btn-default" value="Let's Go!">
 				</form>
 		    </div>
-
 	    </div>
 
 	    <!--================================== GAME PAGE ================================-->
-	    <div class="container" id="game-page">
 
+	    <div id="game-page" class="container initially-hidden">
             <div id="gameboard"></div>
 	    </div>
 

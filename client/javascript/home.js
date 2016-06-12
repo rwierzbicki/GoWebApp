@@ -1,9 +1,7 @@
 var board;
 
 window.onload = function() {
-	hidePages();
-	renderHomePage();
-
+	// Event Listeners
 	$('.new-game-button').click(renderNewGamePage);
 	$('.home-button').click(renderHomePage);
 	$('#submit-options-button').click(startGame); 
