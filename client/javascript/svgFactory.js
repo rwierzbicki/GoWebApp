@@ -26,16 +26,16 @@ var SVGNameSpace = "http://www.w3.org/2000/svg";
  */
 function makeLine(x1, y1, x2, y2, color, stroke) {
 
-    var e = document.createElementNS(SVGNameSpace, "line");
-    e.setAttribute("x1", x1);
-    e.setAttribute("y1", y1);
-    e.setAttribute("x2", x2);
-    e.setAttribute("y2", y2);
+  var e = document.createElementNS(SVGNameSpace, "line");
+  e.setAttribute("x1", x1);
+  e.setAttribute("y1", y1);
+  e.setAttribute("x2", x2);
+  e.setAttribute("y2", y2);
 
-    e.style.stroke      = color || "#000000";
-    e.style.strokeWidth = stroke || 2;
+  e.style.stroke      = color || "#000000";
+  e.style.strokeWidth = stroke || 2;
 
-    return e;
+  return e;
 
 }
 
@@ -59,7 +59,21 @@ function makeSquare(x, y, length){
 	square.style.stroke = '#eac8ae';
 	square.style.strokeWidth = 2;
 
-  	return square; 
+  return square; 
+}
+
+function makeOutsideSquare(x, y, length) {
+  var square = document.createElementNS(SVGNameSpace, "rect"); 
+
+  square.setAttribute("x", x);
+  square.setAttribute("y", y);
+  square.setAttribute("width", length);
+  square.setAttribute("height", length);
+  square.style.fill = "#f5e3d6";
+  square.style.stroke = '#f5e3d6';
+  square.style.strokeWidth = 2;
+
+  return square;
 }
 
 /**
@@ -101,10 +115,10 @@ function makeToken(X, Y, w, src, className, onClick=null){
 * @return {object} 
 */
 function makeSVG(w, h){
-    var s = document.createElementNS(SVGNameSpace, "svg"); 
-    s.setAttribute("width", w); 
-    s.setAttribute("height", w); 
-    s.setAttribute('xmlns', SVGNameSpace);
-    s.setAttribute('xmlns:xlink',"http://www.w3.org/1999/xlink");
-    return s;
+  var s = document.createElementNS(SVGNameSpace, "svg"); 
+  s.setAttribute("width", w); 
+  s.setAttribute("height", w);
+  s.setAttribute('xmlns', SVGNameSpace);
+  s.setAttribute('xmlns:xlink',"http://www.w3.org/1999/xlink");
+  return s;
 }
