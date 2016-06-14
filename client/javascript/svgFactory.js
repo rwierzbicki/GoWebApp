@@ -62,20 +62,6 @@ function makeSquare(x, y, length){
   return square; 
 }
 
-function makeOutsideSquare(x, y, length) {
-  var square = document.createElementNS(SVGNameSpace, "rect"); 
-
-  square.setAttribute("x", x);
-  square.setAttribute("y", y);
-  square.setAttribute("width", length);
-  square.setAttribute("height", length);
-  square.style.fill = "#f5e3d6";
-  square.style.stroke = '#f5e3d6';
-  square.style.strokeWidth = 2;
-
-  return square;
-}
-
 /**
 * Makes and returns a new SVG token object. 
 * 
@@ -120,5 +106,6 @@ function makeSVG(w, h){
   s.setAttribute("height", w);
   s.setAttribute('xmlns', SVGNameSpace);
   s.setAttribute('xmlns:xlink',"http://www.w3.org/1999/xlink");
+
   return s;
 }

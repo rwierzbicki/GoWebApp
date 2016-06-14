@@ -59,21 +59,11 @@ function makeGameBoard() {
 	var svg = $(makeSVG(realSize, realSize));
 
 	currPlayer = PLAYER_1;
-
-	//var sqSize = realSize/(size+1);
+	
 	var sqSize = board.sqSize;
 
-    // top and bottom row (padding)
-    for (var col = 0; col < (size+1); col++) {
-    		svg.append(makeOutsideSquare(col*sqSize, 0, sqSize));
-    		svg.append(makeOutsideSquare(col*sqSize, board.size*sqSize, sqSize));
-    	}
-
-    // left and right column (padding)
-    for (var row = 1; row < (size); row++) {
-    	svg.append(makeOutsideSquare(0, row*sqSize, sqSize));
-    	svg.append(makeOutsideSquare(board.size*sqSize, row*sqSize, sqSize));
-    }
+	// board background
+    svg.append(makeSquare(0, 0, realSize));
 
     // inner board (playfield)
     for (var row = 1; row < (size); row++) {
