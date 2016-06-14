@@ -6,21 +6,20 @@ window.onload = function() {
 }
 
 function showHomePage() {
-	$('.initially-hidden').hide();
-	$('#home-navbar').show();
+	$('.initially-hidden').hide();;
 	$('#home-page').show();
 }
 
 function showNewGamePage() {
 	$('.page-section').hide();
-	$('#other-navbar').show();
 	$('#game-setup-page').show();
+	$('#logo').show();
 }
 
 function showGamePage() {
 	$('.page-section').hide();
-	$('#other-navbar').show();
 	$('#game-page').show();
+	$('#logo').show();
 }
 
 function startGame() {
