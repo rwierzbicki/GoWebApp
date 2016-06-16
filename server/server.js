@@ -25,6 +25,6 @@ app.get("/", function(req, res) {
 	res.redirect('/home.html');
 });
 
-app.listen(3000, function() {
-	console.log("Listening on port 3000");
+app.listen(30094, function() {
+	console.log("Listening on port 30094");
 });
