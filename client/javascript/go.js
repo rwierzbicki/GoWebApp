@@ -19,12 +19,11 @@ PLAYER_2_TOKEN = TOKEN_IMGS.fox;
 
 var board = {
 	size: 0,
-	realSize: 600,
-	sqSize: 0,
+	sqSize: 0,	// in percent
 	hotseat: true,	// TODO: get from game options
 	setSize: function(sizeValue){
 		this.size = sizeValue;
-		this.sqSize = this.realSize / (this.size + 1);
+		this.sqSize = 100 / (this.size + 1);
 	}
 };
 
@@ -54,21 +53,20 @@ function renderUnfinishedGameBoard() {}
 
 function makeGameBoard() {
 	var size = board.size;
-	var realSize = board.realSize;
 
-	var svg = $(makeSVG(realSize, realSize));
+	var svg = $(makeSVG("100%", "100%", "gameboard"));
 
 	currPlayer = PLAYER_1;
 	
 	var sqSize = board.sqSize;
 
 	// board background
-    svg.append(makeSquare(0, 0, realSize));
+    svg.append(makeSquare(0, 0, "100%"));
 
     // inner board (playfield)
     for (var row = 1; row < (size); row++) {
     	for (var col = 1; col < (size); col++) {
-    		svg.append(makeSquare(col*sqSize, row*sqSize, sqSize));
+    		svg.append(makeSquare(col*sqSize+"%", row*sqSize+"%", sqSize+"%"));
     	}
     }
 

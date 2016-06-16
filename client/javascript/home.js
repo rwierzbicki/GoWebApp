@@ -26,5 +26,5 @@ function startGame() {
 	showGamePage();
 	$('#gameboard').empty();
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
-	renderNewGameBoard($('#gameboard'));
+	renderNewGameBoard($('#gameboard-container'));
 }

@@ -44,7 +44,7 @@ function makeLine(x1, y1, x2, y2, color, stroke) {
 * 
 * @param x {number} the x position of the square.
 * @param y {number} the y position of the square.
-* @param length {number} the side length of the square.
+* @param length {string} the side length of the square.
 * 
 * @return {object} 
 */ 
@@ -79,12 +79,12 @@ function makeToken(X, Y, w, src, className, onClick=null){
   var token = document.createElementNS('http://www.w3.org/2000/svg','image');
 
   token.setAttributeNS('http://www.w3.org/1999/xlink','href', src);
-  token.setAttribute("x", X*w+w/2);
-  token.setAttribute("y", Y*w+w/2);
+  token.setAttribute("x", X*w+w/2+"%");
+  token.setAttribute("y", Y*w+w/2+"%");
   token.setAttribute("X", X);
   token.setAttribute("Y", Y);
-  token.setAttribute("width", w);
-  token.setAttribute("height", w);
+  token.setAttribute("width", w+"%");
+  token.setAttribute("height", w+"%");
   token.setAttribute("class", className);
   token.onclick = onClick;
 
@@ -93,17 +93,16 @@ function makeToken(X, Y, w, src, className, onClick=null){
 }
 
 /**
-* Makes an SVG element. 
-* 
-* @param w {number} the width
-* @param h {number} the height 
-* 
+* Makes an SVG element which fills the parent vertically
+* and is square in shape
+*
 * @return {object} 
 */
-function makeSVG(w, h){
+function makeSVG(w, h, id){
   var s = document.createElementNS(SVGNameSpace, "svg"); 
   s.setAttribute("width", w); 
   s.setAttribute("height", w);
+  s.setAttribute("id", id);
   s.setAttribute('xmlns', SVGNameSpace);
   s.setAttribute('xmlns:xlink',"http://www.w3.org/1999/xlink");
 
