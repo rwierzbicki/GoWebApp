@@ -64,6 +64,7 @@ function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard,
 
 function suicide(board, x, y, colour) {
 	// if each board spot around (x,y) in board is opponent colour, return false, else true
+	
 }
 
 /**
@@ -92,10 +93,11 @@ function revertsGameBoard(tempBoard, prevBoard, x, y, colour) {
  */
 function makeMove(board, x, y, colour) {
 	
-	captureCount=0;
+	var captureCount=0;
+	var captured = false;
 	//CURRENTLY USING XHR, BUT WILL CHANGE TO WEB SOCKET
 	// make the move if it is not suicidal
-	if(!suicide(board,x,y,colour) && colour!==0){
+	if(colour!==0){
 		
 		
 	
@@ -127,6 +129,7 @@ function makeMove(board, x, y, colour) {
 						if(response.armies[i].liberties[0][0] === x && response.armies[i].liberties[0][1] === y){
 							//place the token and capture this army
 							board[y][x] = colour;
+							captured = true;
 							for(var j=0;j<response.armies[i].size;j++){
 								var tempx = response.armies[i].tokens[j].position[0];
 								var tempy = response.armies[i].tokens[j].position[1];
@@ -136,6 +139,11 @@ function makeMove(board, x, y, colour) {
 							}
 						}
 						
+					}
+				}
+				if(!captured){
+					if(!suicide){
+						board[y][x] = colour;
 					}
 				}
 				
