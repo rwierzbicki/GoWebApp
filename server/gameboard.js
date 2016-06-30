@@ -160,7 +160,16 @@ function makeMove(board, x, y, colour) {
  * @return boardList {array} board in list form
  */
 function boardArrayToList(boardArray) {
-
+	var boardList = [];
+	for(var i=0;i< boardArray.length;i++){
+		for(var j=0; j<boardArray.length; j++){
+			if(boardArray[i][j] != 0){
+				var temp = [ j, i, boardArray[i][j]];
+				boardList.push(temp);
+			}
+		}
+	}
+	return boardList;
 }
 
 /**
@@ -171,6 +180,15 @@ function boardArrayToList(boardArray) {
  * @return boardArray {array} board in list form
  */
 function boardListToArray(boardList, boardArray) {
+	for(var i=0;i< boardArray.length;i++){
+		for(var j=0; j<boardArray.length; j++){
+			boardArray[i][j] = 0;
+		}
+	}
+
+	for(var k = 0 ; k< boardList.length; k++){
+		boardArray[boardList[k][1],boardList[k][0]] = boardList[k][2];
+	}
 
 }
 
