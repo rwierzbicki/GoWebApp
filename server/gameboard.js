@@ -3,6 +3,7 @@ const NONE = 0;
 const BLACK = 1;
 const WHITE = 2;
 
+
 /**
  * Initializes three objects to 2D arrays with 0s
  *
@@ -12,7 +13,8 @@ const WHITE = 2;
  * @param board3 {obj}
  */
 function init3Boards(size, board1, board2, board3) {
-	
+
+	}
 }
 
 /**
@@ -89,6 +91,61 @@ function revertsGameBoard(tempBoard, prevBoard, x, y, colour) {
  * @return captured tokens {int} 
  */
 function makeMove(board, x, y, colour) {
+	
+	captureCount=0;
+	//CURRENTLY USING XHR, BUT WILL CHANGE TO WEB SOCKET
+	// make the move if it is not suicidal
+	if(!suicide(board,x,y,colour) && colour!==0){
+		
+		
+	
+		//initialize http request, then send current board to GoAI
+		var xhr = new XMLHttpRequest();
+		xhr.open('POST','/util/findArmies',true);
+		xhr.setRequestHeader("Content-type","application/json");
+
+		//dont know what the input of findArmie is yet.
+		obj = {
+			"board" : board,
+		};
+
+		xhr.send(JSON.stringify(obj));
+
+
+		xhr.onreadystatechange = function(){
+			//got response from GoAI
+			if(xhr.readyState == 4 && xhr.status == 200){
+				//need to test results
+				response = JSON.parse(xhr.responseText);			
+				var i;
+
+				// check all armies
+				for(i = 0; i<response.armies.length;i++){
+					//if that armies has only one liberty AND color is different from armie
+					if(response.armies[i].liberties.length === 1 && (response.armies[i].colour != colour) ){
+						// if the only liberty is the place that the token is going to be placed
+						if(response.armies[i].liberties[0][0] === x && response.armies[i].liberties[0][1] === y){
+							//place the token and capture this army
+							board[y][x] = colour;
+							for(var j=0;j<response.armies[i].size;j++){
+								var tempx = response.armies[i].tokens[j].position[0];
+								var tempy = response.armies[i].tokens[j].position[1];
+								board[tempy][tempx] = 0;
+								captureCount++;
+
+							}
+						}
+						
+					}
+				}
+				
+			}
+
+		}
+
+	}
+
+	return captureCount;
 	// place token onto board
 	// capture armies if applicable
 	// return number of captured tokens (could be 0)
