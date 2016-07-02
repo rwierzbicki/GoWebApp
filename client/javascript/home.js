@@ -2,11 +2,12 @@ window.onload = function() {
 	// Event Listeners
 	$('.new-game-button').click(showNewGamePage);
 	$('.home-button').click(showHomePage);
-	$('#submit-options-button').click(startGame); 
+	$('#submit-options-button').click(startGame);
+	$('#submit-login-button').click(submitLogin);
 }
 
 function showHomePage() {
-	$('.initially-hidden').hide();;
+	$('.initially-hidden').hide();
 	$('#home-page').show();
 }
 
@@ -27,4 +28,13 @@ function startGame() {
 	$('#gameboard').empty();
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
 	renderNewGameBoard($('#gameboard-container'));
+}
+
+function submitLogin() {
+	var form = document.getElementById("login-form").elements;
+	var username = form["username"].value;
+	var password = form["password"].value;
+
+	console.log("Username: " + username);
+	console.log("Password: " + password);
 }
