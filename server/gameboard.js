@@ -13,8 +13,7 @@ const WHITE = 2;
  * @param board3 {obj}
  */
 function init3Boards(size, board1, board2, board3) {
-
-	}
+	
 }
 
 /**
@@ -195,7 +194,7 @@ function boardListToArray(boardList, boardArray) {
 	}
 
 	for(var k = 0 ; k< boardList.length; k++){
-		boardArray[boardList[k][1],boardList[k][0]] = boardList[k][2];
+		boardArray[boardList[k][1]][boardList[k][0]] = boardList[k][2];
 	}
 
 }
@@ -231,10 +230,26 @@ function countTerritories(board) {
 /**
  * Applies the move after validation
  *
- *	@return board list {array} list form of board state
+ * @param prevBoard {2D array} board state last turn
+ * @param currBoard {2D array} current board state
+ * @param tempBoard {2D array} board state after placing token
+ * @return board list {array} list form of board state
  */
 function applyMove(prevBoard, currBoard, tempBoard) {
 	// move currBoard data to prevBoard and
 	// tempBoard to currBoard
 	// return boardArrayToList(currBoard)
+}
+
+module.exports = {
+	init3Boards,
+	validateMoveAndCalculateCapturedTokens,
+	suicide,
+	revertsGameBoard,
+	makeMove,
+	boardArrayToList,
+	boardListToArray,
+	calculateScore,
+	countTerritories,
+	applyMove
 }
