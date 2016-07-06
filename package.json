@@ -4,7 +4,9 @@
   "description": "A simple application to play Go online",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha",
+    "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
+    "start": "node server/server.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +24,10 @@
     "express": "^4.13.4",
     "jquery": "^2.2.4",
     "socket.io": "latest"
+  },
+  "devDependencies": {
+    "mocha": "^2.5.3",
+    "chai": "^3.5.0",
+    "istanbul": "^0.4.4"
   }
 }
