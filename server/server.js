@@ -63,6 +63,9 @@ io.sockets.on('connection', function(socket){
 		if(command == 'getAuthStatus'){
 			response('' + isLoggedIn.toString());
 		}
+		if(command == 'dbTest'){
+
+		}
 	});
 
 	socket.emit('publish', 'Welcome, your id is: ' + socket.id);
@@ -90,7 +93,7 @@ io.sockets.on('connection', function(socket){
 			}else if(command == 'pvt'){
 				var user = args[1];
 				var msg = args[2];
-				if(conenctionList[user] == undefined){
+			 	if(conenctionList[user] == undefined){
 					socket.emit('publish', 'Specified user does not exist');
 				}else{
 					conenctionList[user].emit('publish', '[Private @ ' + socket.id + ']: ' + msg);
@@ -109,3 +112,9 @@ io.sockets.on('connection', function(socket){
 	});
 });
 
+process.on('SIGINT', function(){
+	console.log(' Ctrl+C Pressed. Saving changes...');
+	// Save changes here
+	console.log('Exiting...')
+	process.exit(0);
+});

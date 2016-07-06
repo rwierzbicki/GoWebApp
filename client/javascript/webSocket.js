@@ -4,6 +4,7 @@ socket.on('publish', function(data) {
 	console.log('>> ' + data);
 });
 
+// Authentication function
 function auth(username, password){
 	var authObj = {username : username, password: password};
 	socket.emit('auth', JSON.stringify(authObj), function(result){
@@ -15,6 +16,7 @@ function auth(username, password){
 	});
 }
 
+// Send general command
 function send(command){
 	socket.emit('control', command, function(response){
 		console.log(response);
