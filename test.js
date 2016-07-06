@@ -1,6 +1,6 @@
 var assert = require('chai').assert;
-var gameboard = require('../gameboard');
-var compare = require('../compare');
+var compare = require('./server/compare');
+var gameboard = require('./server/gameboard');
 
 describe('gameboard', function() {
 	describe('#init3Boards', function () {
