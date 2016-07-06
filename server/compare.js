@@ -64,7 +64,7 @@ function array2DEqual(array1, array2) {
  * Determines of two arrays have the same values in
  * the same order
  */
-function arrayEqual(array1, array1) {
+function arrayEqual(array1, array2) {
 	if (!Array.isArray(array1) || !Array.isArray(array2)) {
         return false;
     }

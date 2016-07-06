@@ -134,10 +134,10 @@ describe('gameboard', function() {
 			assert.equal(true, compare.arrayEqual([0, 0], gameboard.countTerritories(board)));
 
 			board = [ [0, 0, 0], [0, 1, 0], [0, 0, 0] ];
-			assert.equal(true, compare.arrayEqual([8, 0]), gameboard.countTerritories(board));
+			assert.equal(true, compare.arrayEqual([8, 0], gameboard.countTerritories(board)));
 
 			board = [ [0, 1, 2, 0], [0, 1, 2, 0], [1, 1, 2, 0], [0, 0, 2, 0] ];
-			assert.equal(true, compare.arrayEqual([2, 4]), gameboard.countTerritories(board));
+			assert.equal(true, compare.arrayEqual([2, 4], gameboard.countTerritories(board)));
 		});
 	});
 
