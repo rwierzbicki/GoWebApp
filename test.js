@@ -89,7 +89,9 @@ describe('gameboard', function() {
 	describe('#boardArrayToList', function () {
 		it('should return empty list if no tokens placed', function () {
 			board = [ [0, 0], [0,0] ];
-			assert.equal([], gameboard.boardArrayToList(board));
+			var list = gameboard.boardArrayToList(board);
+			assert.isArray(list);
+			assert.equal(list.length, 0);
 		});
 		it('should return board in list form', function () {
 			board = [ [0, 1], [0, 2] ];
