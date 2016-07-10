@@ -1,4 +1,4 @@
-var assert = require('chai').assert;
+var assert = require('assert');
 var compare = require('./server/compare');
 var gameboard = require('./server/gameboard');
 
@@ -11,9 +11,9 @@ describe('gameboard', function() {
 			var board = [ [0, 0, 0], [0, 0, 0], [0, 0, 0] ];
 
 			gameboard.init3Boards(3, board1, board2, board3);
-			assert.equal(true, compare.array2DEqual(board, board1));
-			assert.equal(true, compare.array2DEqual(board, board2));
-			assert.equal(true, compare.array2DEqual(board, board3));
+			assert.deepEqual(board, board2);
+			assert.deepEqual(board, board3);
+			assert.deepEqual(board, board1);
 		});
 	});
 
@@ -90,8 +90,7 @@ describe('gameboard', function() {
 		it('should return empty list if no tokens placed', function () {
 			board = [ [0, 0], [0,0] ];
 			var list = gameboard.boardArrayToList(board);
-			assert.isArray(list);
-			assert.equal(list.length, 0);
+			assert.deepEqual([], list)
 		});
 		it('should return board in list form', function () {
 			board = [ [0, 1], [0, 2] ];
@@ -126,20 +125,20 @@ describe('gameboard', function() {
 			var score1 = 2.5 + 20 + 9 + 4;
 			// score2 = armies + territory + captured tokens
 			var score2 = 20 + 13 + 8;
-			assert.equal(true, compare.arrayEqual([score1, score2], gameboard.calculateScore(board, 4, 8)));
+			assert.deepEqual([score1, score2], gameboard.calculateScore(board, 4, 8));
 		});
 	});
 
 	describe('#countTerritories', function() {
 		it('should return both players\' territories', function() {
 			board = [ [0, 1], [0, 2] ];
-			assert.equal(true, compare.arrayEqual([0, 0], gameboard.countTerritories(board)));
+			assert.deepEqual([0, 0], gameboard.countTerritories(board));
 
 			board = [ [0, 0, 0], [0, 1, 0], [0, 0, 0] ];
-			assert.equal(true, compare.arrayEqual([8, 0], gameboard.countTerritories(board)));
+			assert.deepEqual([8, 0], gameboard.countTerritories(board));
 
 			board = [ [0, 1, 2, 0], [0, 1, 2, 0], [1, 1, 2, 0], [0, 0, 2, 0] ];
-			assert.equal(true, compare.arrayEqual([2, 4], gameboard.countTerritories(board)));
+			assert.deepEqual([2, 4], gameboard.countTerritories(board));
 		});
 	});
 
@@ -150,9 +149,8 @@ describe('gameboard', function() {
 			var tempBoard = [ [1, 1], [1, 2] ];
 			gameboard.applyMove(prevBoard, currBoard, tempBoard);
 
-			assert.equal(true, compare.array2DEqual(prevBoard, [ [1, 0], [1, 0] ]));
-			assert.equal(true, compare.array2DEqual(currBoard, [ [1, 1], [1, 2] ]));
+			assert.deepEqual(prevBoard, [ [1, 0], [1, 0] ]);
+			assert.deepEqual(currBoard, [ [1, 1], [1, 2] ]);
 		});
 	});
 });
-
