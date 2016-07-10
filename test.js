@@ -165,3 +165,38 @@ describe('gameboard', function() {
 		});
 	});
 });
+
+describe('compare', function () {
+	describe('#unorderedArray2DEqual', function () {
+		var arr1 = [ [0, 3], [1, 8], [10, 1] ];
+		var arr2 = [ [0, 3], [1, 8], [10, 1] ];
+
+		it('should return true if two arrays have the same subarrays in the same order', function () {
+			assert.equal(true, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+
+		it('should return true if two arrays have the same subarrays in a different order', function () {
+			arr2 = [ [10, 1], [1, 8], [0, 3] ];
+			assert.equal(true, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+
+		it('should return true if two arrays are both empty', function() {
+			assert.equal(true, compare.unorderedArray2DEqual([], []));
+		});
+
+		it('should return false if either input is not an array', function () {
+			assert.equal(false, compare.unorderedArray2DEqual(arr1, "hello"));
+			assert.equal(false, compare.unorderedArray2DEqual(4, arr1));
+		});
+
+		it('should return false if the arrays have different lengths', function () {
+			arr2 = [ [10, 1], [1, 8], ];
+			assert.equal(false, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+
+		it('should return false if the arrays do not have the same subarrays', function () {
+			arr2 = [ [10, 1], [1, 8], [1, 2]];
+			assert.equal(false, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+	});
+});
