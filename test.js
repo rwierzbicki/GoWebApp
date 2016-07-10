@@ -1,4 +1,4 @@
-var assert = require('chai').assert;
+var assert = require('assert');
 var compare = require('./server/compare');
 var gameboard = require('./server/gameboard');
 
@@ -11,9 +11,9 @@ describe('gameboard', function() {
 			var board = [ [0, 0, 0], [0, 0, 0], [0, 0, 0] ];
 
 			gameboard.init3Boards(3, board1, board2, board3);
-			assert.equal(true, compare.array2DEqual(board, board1));
-			assert.equal(true, compare.array2DEqual(board, board2));
-			assert.equal(true, compare.array2DEqual(board, board3));
+			assert.deepEqual(board, board2);
+			assert.deepEqual(board, board3);
+			assert.deepEqual(board, board1);
 		});
 	});
 
@@ -38,15 +38,26 @@ describe('gameboard', function() {
 		});
 	});
 
-	describe('#suicide', function () {
-		it('should return true if move results in suicide', function () {
-			// edge of board
-			board = [ [1, 0], [0, 1], [1, 0] ];
-			assert.equal(true, gameboard.suicide(board, 0, 1, 2));
+	describe('#suicide', function() {
+		var board = [ [0, 1], [1, 1] ];
 
-			// middle of board
-			board = [ [0, 0, 0], [0, 2, 0], [2, 0, 2], [0, 2, 0] ];
-			assert.equal(-1, gameboard.suicide(board, 2, 1, 1));
+		it('should return true if placing token in a corner surrounded by opponent tokens', function() {
+			assert.equal(true, gameboard.suicide(board, 0, 0, 2));
+		});
+
+		it('should return true if placing token in the center surrounded by opponent tokens', function() {
+			board = [ [2, 2, 2], [2, 0, 2], [2, 2, 2] ];
+			assert.equal(true, gameboard.suicide(board, 1, 1, 1));
+		});
+
+		it('should return false if placing token in a corner not surrounded by opponent tokens', function() {
+			board = [ [0, 1], [2, 1] ];
+			assert.equal(false, gameboard.suicide(board, 0, 0, 2));
+		});
+
+		it('should return false if placing token in the center not surrounded by opponent tokens', function() {
+			board = [ [0, 0, 2], [2, 0, 1], [2, 1, 1] ];
+			assert.equal(false, gameboard.suicide(board, 1, 1, 2));
 		});
 	});
 
@@ -90,8 +101,7 @@ describe('gameboard', function() {
 		it('should return empty list if no tokens placed', function () {
 			board = [ [0, 0], [0,0] ];
 			var list = gameboard.boardArrayToList(board);
-			assert.isArray(list);
-			assert.equal(list.length, 0);
+			assert.deepEqual([], list)
 		});
 		it('should return board in list form', function () {
 			board = [ [0, 1], [0, 2] ];
@@ -105,7 +115,7 @@ describe('gameboard', function() {
 			var boardList = gameboard.boardArrayToList(board);
 			board = [ [1, 2], [1, 0] ];
 			gameboard.boardListToArray(boardList, board);
-			assert.equal(true, compare.array2DEqual([ [0, 1], [0, 2] ], board));
+			assert.deepEqual([ [0, 1], [0, 2] ], board);
 		});
 	});
 
@@ -126,20 +136,20 @@ describe('gameboard', function() {
 			var score1 = 2.5 + 20 + 9 + 4;
 			// score2 = armies + territory + captured tokens
 			var score2 = 20 + 13 + 8;
-			assert.equal(true, compare.arrayEqual([score1, score2], gameboard.calculateScore(board, 4, 8)));
+			assert.deepEqual([score1, score2], gameboard.calculateScore(board, 4, 8));
 		});
 	});
 
 	describe('#countTerritories', function() {
 		it('should return both players\' territories', function() {
 			board = [ [0, 1], [0, 2] ];
-			assert.equal(true, compare.arrayEqual([0, 0], gameboard.countTerritories(board)));
+			assert.deepEqual([0, 0], gameboard.countTerritories(board));
 
 			board = [ [0, 0, 0], [0, 1, 0], [0, 0, 0] ];
-			assert.equal(true, compare.arrayEqual([8, 0], gameboard.countTerritories(board)));
+			assert.deepEqual([8, 0], gameboard.countTerritories(board));
 
 			board = [ [0, 1, 2, 0], [0, 1, 2, 0], [1, 1, 2, 0], [0, 0, 2, 0] ];
-			assert.equal(true, compare.arrayEqual([2, 4], gameboard.countTerritories(board)));
+			assert.deepEqual([2, 4], gameboard.countTerritories(board));
 		});
 	});
 
@@ -150,9 +160,43 @@ describe('gameboard', function() {
 			var tempBoard = [ [1, 1], [1, 2] ];
 			gameboard.applyMove(prevBoard, currBoard, tempBoard);
 
-			assert.equal(true, compare.array2DEqual(prevBoard, [ [1, 0], [1, 0] ]));
-			assert.equal(true, compare.array2DEqual(currBoard, [ [1, 1], [1, 2] ]));
+			assert.deepEqual(prevBoard, [ [1, 0], [1, 0] ]);
+			assert.deepEqual(currBoard, [ [1, 1], [1, 2] ]);
 		});
 	});
 });
 
+describe('compare', function () {
+	describe('#unorderedArray2DEqual', function () {
+		var arr1 = [ [0, 3], [1, 8], [10, 1] ];
+		var arr2 = [ [0, 3], [1, 8], [10, 1] ];
+
+		it('should return true if two arrays have the same subarrays in the same order', function () {
+			assert.equal(true, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+
+		it('should return true if two arrays have the same subarrays in a different order', function () {
+			arr2 = [ [10, 1], [1, 8], [0, 3] ];
+			assert.equal(true, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+
+		it('should return true if two arrays are both empty', function() {
+			assert.equal(true, compare.unorderedArray2DEqual([], []));
+		});
+
+		it('should return false if either input is not an array', function () {
+			assert.equal(false, compare.unorderedArray2DEqual(arr1, "hello"));
+			assert.equal(false, compare.unorderedArray2DEqual(4, arr1));
+		});
+
+		it('should return false if the arrays have different lengths', function () {
+			arr2 = [ [10, 1], [1, 8], ];
+			assert.equal(false, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+
+		it('should return false if the arrays do not have the same subarrays', function () {
+			arr2 = [ [10, 1], [1, 8], [1, 2]];
+			assert.equal(false, compare.unorderedArray2DEqual(arr1, arr2));
+		});
+	});
+});
