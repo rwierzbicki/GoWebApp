@@ -38,15 +38,26 @@ describe('gameboard', function() {
 		});
 	});
 
-	describe('#suicide', function () {
-		it('should return true if move results in suicide', function () {
-			// edge of board
-			board = [ [1, 0], [0, 1], [1, 0] ];
-			assert.equal(true, gameboard.suicide(board, 0, 1, 2));
+	describe('#suicide', function() {
+		var board = [ [0, 1], [1, 1] ];
 
-			// middle of board
-			board = [ [0, 0, 0], [0, 2, 0], [2, 0, 2], [0, 2, 0] ];
-			assert.equal(-1, gameboard.suicide(board, 2, 1, 1));
+		it('should return true if placing token in a corner surrounded by opponent tokens', function() {
+			assert.equal(true, gameboard.suicide(board, 0, 0, 2));
+		});
+
+		it('should return true if placing token in the center surrounded by opponent tokens', function() {
+			board = [ [2, 2, 2], [2, 0, 2], [2, 2, 2] ];
+			assert.equal(true, gameboard.suicide(board, 1, 1, 1));
+		});
+
+		it('should return false if placing token in a corner not surrounded by opponent tokens', function() {
+			board = [ [0, 1], [2, 1] ];
+			assert.equal(false, gameboard.suicide(board, 0, 0, 2));
+		});
+
+		it('should return false if placing token in the center not surrounded by opponent tokens', function() {
+			board = [ [0, 0, 2], [2, 0, 1], [2, 1, 1] ];
+			assert.equal(false, gameboard.suicide(board, 1, 1, 2));
 		});
 	});
 
@@ -104,7 +115,7 @@ describe('gameboard', function() {
 			var boardList = gameboard.boardArrayToList(board);
 			board = [ [1, 2], [1, 0] ];
 			gameboard.boardListToArray(boardList, board);
-			assert.equal(true, compare.array2DEqual([ [0, 1], [0, 2] ], board));
+			assert.deepEqual([ [0, 1], [0, 2] ], board);
 		});
 	});
 
