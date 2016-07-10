@@ -64,8 +64,31 @@ function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard,
  */
 
 function suicide(board, x, y, colour) {
-	// if each board spot around (x,y) in board is opponent colour, return false, else true
+	var oppColour = (colour === 1? 2 : 1);
+
+    var dx = [-1, 0, 1, 0];
+    var dy = [0, 1, 0, -1];
+
+    for (var direction = 0; direction < 4; direction++) {
+        var neighbourX = x + dx[direction];
+        var neighbourY = y + dy[direction];
+        if (inBounds(board, neighbourX, neighbourY) && board[neighbourY][neighbourX] !== oppColour) {
+            return false;
+        }
+    }
+
+    return true;
 	
+}
+
+/**
+ * @param board {2D array}
+ * @param x {int} x coordinate
+ * @param y {int} y coordinate
+ * @return {Boolean} true if (x,y) is in the board
+ */
+function inBounds(board, x, y) {
+    return (y >= 0 && y < board.length && x >= 0 && x < board.length);
 }
 
 /**
