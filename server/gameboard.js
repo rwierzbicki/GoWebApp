@@ -228,13 +228,46 @@ function boardListToArray(boardList, boardArray) {
  * Calculates both players' scores
  *
  * @param board {2D array}
- * @param capturedTokens1 {int} player 1's captured tokens
- * @param capturedTokens1 {int} player 2's captured tokens
+ * @param capturedTokens1 {int} player 1's captured tokens(Black)
+ * @param capturedTokens1 {int} player 2's captured tokens(White)
  * @return scores { [player1Score player2Score ] }
  */
 function calculateScore(board, capturedTokens1, capturedTokens2) {
 	// score = army tokens + captured tokens + territory (use countTerritories()) + handicap (for white)
-	// handicap scores: 9x9 - 2.5 points, 13x13 - 4.5 points, 19x19 - 7.5 points
+	// handicap scores: 9x9 - 2.5 points, 13x13 - 4.5 points, 19x19 - 7.5 points(Add points for white)
+	//score[0] is black, score[1] is white
+	var score = [0, 0];
+	var token_Num_Black = 0;
+	var token_Num_White = 0;
+	var handicap = 0;
+	var count = countTerritories(board);
+
+	for(var i = 0; i < board.length; i++){
+		for(var j = 0; j < board.length; j++){
+			if(board[j][i] == 1){
+				token_Num_Black++;
+			}
+			if(board[j][i] == 2){
+				token_Num_White++;
+			}
+		}
+	}
+
+	if(board.length == 9){
+		handicap = 2.5;
+	}
+	if(board.length == 13){
+		handicap = 4.5;
+	}
+	if(board.length == 19){
+		handicap = 7.5;
+	}
+
+	score[0] = token_Num_Black + capturedTokens1 + count[0];
+	score[1] = token_Num_White + capturedTokens2 + count[1] + handicap;
+	
+
+	return score;
 }
 
 /**
