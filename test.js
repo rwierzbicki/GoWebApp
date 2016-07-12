@@ -81,20 +81,47 @@ describe('gameboard', function() {
 	});
 
 	describe('#makeMove', function () {
-		it('should return number of captured tokens', function () {
-			board = [ [2, 1, 0], [0, 2, 1], [0, 0, 2] ];
-			assert.equal(2, gameboard.makeMove(board, 2, 0, 2));
+	    it('should return number of captured tokens CASE: capture 2 armies 2 tokens', function () {
 
-			board = [ [1, 2, 0], [1, 0, 0], [2, 1, 0] ];
-			assert.equal(2, gameboard.makeMove(board, 1, 1, 2));
+	        board = [[2, 1, 0],
+                        [0, 2, 1],
+                        [0, 0, 2]];
 
-			// captures multiple armies
-			board = [ [1, 2, 0], [1, 0, 0], [2, 1, 2] ];
-			assert.equal(3, gameboard.makeMove(board, 1, 1, 2));
+	        gameboard.makeMove(board, 2, 0, 2, function (cap) {
+	            assert.equal(cap, 2);
+	        });
+	    });
 
-			board = [ [0, 1, 0], [1, 2, 0], [0, 1, 0] ];
-			assert.equal(1, gameboard.makeMove(board, 2, 1, 1));
-		});
+	    it('should return number of captured tokens CASE: capture 1 army 2 tokens', function () {
+	        board = [[1, 2, 0],
+                        [1, 0, 0],
+                        [2, 1, 0]];
+	        gameboard.makeMove(board, 1, 1, 2, function (cap) {
+	            assert.equal(cap, 2);
+	        });
+	    });
+
+	    it('should return number of captured tokens CASE: capture 2 armies 3 tokens', function () {
+	        // captures multiple armies
+	        board = [[1, 2, 0],
+                        [1, 0, 0],
+                        [2, 1, 2]];
+
+	        gameboard.makeMove(board, 1, 1, 2, function (cap) {
+	            assert.equal(3, cap);
+	        });
+	    });
+
+	    it('should return number of captured tokens CASE: capture 1 army 1 token', function () {
+	        board = [[0, 1, 0],
+                        [1, 2, 0],
+                        [0, 1, 0]];
+
+	        gameboard.makeMove(board, 2, 1, 1, function (cap) {;
+	            assert.equal(1, cap);
+	        });
+	    });
+
 	});
 
 	describe('#boardArrayToList', function () {

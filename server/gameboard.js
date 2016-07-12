@@ -3,6 +3,7 @@ const NONE = 0;
 const BLACK = 1;
 const WHITE = 2;
 
+var http = require('http');
 
 /**
  * Initializes three objects to 2D arrays with 0s
@@ -90,72 +91,92 @@ function revertsGameBoard(tempBoard, prevBoard, x, y, colour) {
  * @param colour {int} colour of token
  * @return captured tokens {int} 
  */
-function makeMove(board, x, y, colour) {
-	
-	var captureCount=0;
-	var captured = false;
-	//CURRENTLY USING XHR, BUT WILL CHANGE TO WEB SOCKET
-	// make the move if it is not suicidal
-	if(colour!==0){
-		
-		
-	
-		//initialize http request, then send current board to GoAI
-		var xhr = new XMLHttpRequest();
-		xhr.open('POST','/util/findArmies',true);
-		xhr.setRequestHeader("Content-type","application/json");
+function makeMove(board, y, x, colour, lastMove, fn) {
 
-		//dont know what the input of findArmie is yet.
-		obj = {
-			"board" : board,
-		};
+    var captureCount = 0;
 
-		xhr.send(JSON.stringify(obj));
+    if (colour !== 0) {
+
+        var option = {
+            host: "roberts.seng.uvic.ca",
+            port: "30000",
+            path: "/util/findArmies",
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        }
+
+        var callback = function (response) {
+            var str = "";
+
+            response.on('data', function (chunk) {
+                str += chunk.toString();
+
+            });
+
+            response.on('end', function () {
+                //console.log("data: " + str);
+
+                var jsonObj = JSON.parse(str);
+                //add code here
+                for (i = 0; i < jsonObj.armies.length; i++) {
+                    //if that armies has only one liberty AND color is different from armie
+                    if (jsonObj.armies[i].liberties.length === 1 && (jsonObj.armies[i].colour != colour)) {
+                        // if the only liberty is the place that the token is going to be placed
+                        if (jsonObj.armies[i].liberties[0][0] === x && jsonObj.armies[i].liberties[0][1] === y) {
+                            //place the token and capture this army
+                            board[y][x] = colour;
+                            captured = true;
+                            for (var j = 0; j < jsonObj.armies[i].size; j++) {
+                                var tempx = jsonObj.armies[i].tokens[j].position[0];
+                                var tempy = jsonObj.armies[i].tokens[j].position[1];
+                                board[tempy][tempx] = 0;
+                                captureCount++;
+
+                            }
+                        }
+
+                    }
+                }
+                console.log("captured: " + captureCount);
+                fn(captureCount);
+            });
 
 
-		xhr.onreadystatechange = function(){
-			//got response from GoAI
-			if(xhr.readyState == 4 && xhr.status == 200){
-				//need to test results
-				response = JSON.parse(xhr.responseText);			
-				var i;
+        }
 
-				// check all armies
-				for(i = 0; i<response.armies.length;i++){
-					//if that armies has only one liberty AND color is different from armie
-					if(response.armies[i].liberties.length === 1 && (response.armies[i].colour != colour) ){
-						// if the only liberty is the place that the token is going to be placed
-						if(response.armies[i].liberties[0][0] === x && response.armies[i].liberties[0][1] === y){
-							//place the token and capture this army
-							board[y][x] = colour;
-							captured = true;
-							for(var j=0;j<response.armies[i].size;j++){
-								var tempx = response.armies[i].tokens[j].position[0];
-								var tempy = response.armies[i].tokens[j].position[1];
-								board[tempy][tempx] = 0;
-								captureCount++;
+        postData = {
+            "board": board,
+            "size": 3,
+            "last": {
+                "x": 0,
+                "y": 1,
+                "pass": false,
+                "c": 1
+            }
+        };
 
-							}
-						}
-						
-					}
-				}
-				if(!captured){
-					if(!suicide){
-						board[y][x] = colour;
-					}
-				}
-				
-			}
+        var req = http.request(option, callback);
 
-		}
+        req.on('error', function (e) {
+            console.log("Error: " + e.message);
+        });
 
-	}
+        req.write(JSON.stringify(postData));
 
-	return captureCount;
-	// place token onto board
-	// capture armies if applicable
-	// return number of captured tokens (could be 0)
+
+
+        req.end();
+
+
+    }
+
+
+
+    // place token onto board
+    // capture armies if applicable
+    // return number of captured tokens (could be 0)
 }
 
 /**
