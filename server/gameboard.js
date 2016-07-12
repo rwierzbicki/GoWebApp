@@ -319,6 +319,11 @@ function applyMove(prevBoard, currBoard, tempBoard) {
 	// move currBoard data to prevBoard and
 	// tempBoard to currBoard
 	// return boardArrayToList(currBoard)
+	prevBoard[0] = currBoard[0];
+	prevBoard[1] = currBoard[1];
+	currBoard[0] = tempBoard[0];
+	currBoard[1] = tempBoard[1];
+	boardArrayToList(currBoard);
 }
 
 module.exports = {
