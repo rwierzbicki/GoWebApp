@@ -159,10 +159,10 @@ describe('gameboard', function() {
 				[0, 0, 1, 2, 0, 1, 0, 2, 2],
 				[0, 0, 0, 0, 0, 0, 2, 0, 0]
 			];
-			// score1 = handicap + armies + territory + captured tokens
-			var score1 = 2.5 + 20 + 9 + 4;
-			// score2 = armies + territory + captured tokens
-			var score2 = 20 + 13 + 8;
+			// score1 (black) = armies + territory + captured tokens
+			var score1 = 20 + 9 + 4;
+			// score2 (white) = handicap + armies + territory + captured tokens
+			var score2 = 2.5 + 20 + 13 + 8;
 			assert.deepEqual([score1, score2], gameboard.calculateScore(board, 4, 8));
 		});
 	});
