@@ -132,15 +132,37 @@
             	<div class="col-md-4">
             		<table class="table">
 	            		<tr><td>
-	            			Player 1
+	            			<h4 id="p1-name"></h4>
+	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p1-token" class="player-token"/></a>
 	            		</td></tr>
 	            		<tr><td>
-	            			Player 2
+	            			<h4 id="p2-name"></h4>
+	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p2-token" class="player-token"/></a>
 	            		</td></tr>
 	            	</table>
             	</div>
             </div>
 	    </div>
+
+	    <!--============================TOKEN SELECTION MODAL============================-->
+
+	    <div id="chooseTokenModal" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-sm">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Choose Token</h4>
+					</div>
+					<div id="chooseTokenBody" class="modal-body">
+
+					</div>
+				</div>
+
+			</div>
+		</div>
+
 
 	    <!-- Bootstrap core JavaScript
 	    ================================================== -->

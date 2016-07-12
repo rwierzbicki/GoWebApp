@@ -25,9 +25,71 @@ var board = {
 		this.size = sizeValue;
 		this.sqSize = 100 / (this.size + 1);
 	}
-};
+}
 
 var currPlayer;
+var playerNewToken; // which player is changing their token
+
+
+function onTokenModalOpened(event) {
+	playerNewToken = (event.relatedTarget.childNodes[0].id === "p1-token" ? 1 : 2);
+}
+
+/**
+ *	 Loads each player's name and token onto the screen
+ */
+function updatePlayerInfo() {
+	document.getElementById('p1-name').innerHTML = "Player 1";
+	document.getElementById('p1-token').src = PLAYER_1_TOKEN;
+	document.getElementById('p2-name').innerHTML = "Player 2";
+	document.getElementById('p2-token').src = PLAYER_2_TOKEN;
+}
+
+// load tokens into Token Selection Modal
+function loadTokenSelectionModal() {
+	var modalBody = document.getElementById('chooseTokenBody');
+	for (var key in TOKEN_IMGS) {
+		var a = document.createElement('a');
+		var img = document.createElement('img');
+		img.src = TOKEN_IMGS[key];
+		img.id = TOKEN_IMGS[key];
+		a.onclick = onClickNewToken;
+
+		// token is already being used
+		if (TOKEN_IMGS[key] === PLAYER_1_TOKEN || TOKEN_IMGS[key] === PLAYER_2_TOKEN ) {
+			img.className = "choose-token-image taken";
+		} else {
+			img.className = "choose-token-image";
+		}
+
+		a.appendChild(img);
+		modalBody.appendChild(a);
+	}
+}
+
+function onClickNewToken(event) {
+	if (event.target.className === "choose-token-image taken") {
+		return;
+	}
+
+	if (playerNewToken === 1) {
+		document.getElementById(PLAYER_1_TOKEN).className = "choose-token-image";
+		PLAYER_1_TOKEN = event.target.id;
+		document.getElementById(PLAYER_1_TOKEN).className = "choose-token-image taken";
+		document.getElementById("p1-token").src = PLAYER_1_TOKEN;
+		swapUnplacedTokens(PLAYER_1_TOKEN);
+		swapPlacedTokens(1, PLAYER_1_TOKEN);
+	} else {
+		document.getElementById(PLAYER_2_TOKEN).className = "choose-token-image";
+		PLAYER_2_TOKEN = event.target.id;
+		document.getElementById(PLAYER_2_TOKEN).className = "choose-token-image taken";
+		document.getElementById("p2-token").src = PLAYER_2_TOKEN;
+		swapUnplacedTokens(PLAYER_2_TOKEN);
+		swapPlacedTokens(2, PLAYER_2_TOKEN);
+	}
+
+	$('#chooseTokenModal').modal('hide');
+}
 
 /*
 * @param container {div DOM} the element in which the board will be created
@@ -75,7 +137,7 @@ function makeGameBoard() {
 
 function onClickToken(event) {
 	var token = event.target;
-	token.setAttributeNS(null, "class", "token-image placed");
+	token.setAttributeNS(null, "class", "token-image placed " + currPlayer);
 	
 	if (board.hotseat) {
 		if (currPlayer == PLAYER_1) {
@@ -87,7 +149,24 @@ function onClickToken(event) {
 		}
 	}
 
-	// switch unplaced token image
+	swapUnplacedTokens(imgPath);
+	
+}
+
+function swapPlacedTokens(player, newImage) {
+	if (player === 1) 
+		var tokens = document.getElementsByClassName('token-image placed 1');
+	else
+		var tokens = document.getElementsByClassName('token-image placed 2');
+
+	swapUnplacedTokens(newImage);
+	for (var i = 0; i < tokens.length; i++) {
+		tokens[i].setAttributeNS('http://www.w3.org/1999/xlink','href', newImage);
+	}
+
+}
+
+function swapUnplacedTokens(imgPath) {
 	var unplacedTokens = document.getElementsByClassName('token-image unplaced');
 	for (var i = 0; i < unplacedTokens.length; i++)
 		unplacedTokens[i].setAttributeNS('http://www.w3.org/1999/xlink','href', imgPath);

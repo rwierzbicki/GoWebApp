@@ -4,24 +4,43 @@
 
 /* Right align navbar options excluding logo */
 .nav.pull-right {
-    float: right;
-    margin-right: 98px;
+  float: right;
+  margin-right: 98px;
 }
 
 .token-image {
-    position: absolute;
+  position: absolute;
 }
 
 .token-image.unplaced {
-    opacity: 0;
+  opacity: 0;
 }
 
 .token-image.unplaced:hover {
-    opacity: 0.3;
+  opacity: 0.3;
 }
 
 .token-image.placed {
-    opacity: 1;
+  opacity: 1;
+}
+
+.player-token {
+  height: 50px;
+  width: 50px;
+}
+
+.choose-token-image {
+  /*height: ;*/
+  width: 33%;
+  padding: 10px;
+}
+
+.choose-token-image:hover {
+  filter: brightness(85%);
+}
+
+.choose-token-image.taken {
+  filter: brightness(40%);
 }
 
 /* need this to make the gameboard dynamic */
@@ -33,8 +52,8 @@
 
 #gameboard {
 	position: absolute;
-   	top: 0;
-   	right: 0;
-   	left: 0;
-   	bottom: 0;
+ 	top: 0;
+ 	right: 0;
+ 	left: 0;
+ 	bottom: 0;
 }

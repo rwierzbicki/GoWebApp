@@ -4,6 +4,9 @@ window.onload = function() {
 	$('.home-button').click(showHomePage);
 	$('#submit-options-button').click(startGame);
 	$('#submit-login-button').click(submitLogin);
+	$('#chooseTokenModal').on('show.bs.modal', onTokenModalOpened);
+
+	loadTokenSelectionModal();
 }
 
 function showHomePage() {
@@ -28,6 +31,7 @@ function startGame() {
 	$('#gameboard').empty();
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
 	renderNewGameBoard($('#gameboard-container'));
+	updatePlayerInfo();
 }
 
 function submitLogin() {
