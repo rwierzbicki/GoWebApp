@@ -94,9 +94,9 @@ describe('gameboard', function() {
 
 	    it('should return number of captured tokens CASE: capture 1 army 2 tokens', function () {
 	        board = [[1, 2, 0],
-                        [1, 0, 0],
-                        [2, 1, 0]];
-	        gameboard.makeMove(board, 1, 1, 2, function (cap) {
+                        [1, 2, 0],
+                        [0, 1, 0]];
+	        gameboard.makeMove(board, 0, 2, 2, function (cap) {
 	            assert.equal(cap, 2);
 	        });
 	    });

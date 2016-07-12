@@ -139,7 +139,7 @@ function makeMove(board, y, x, colour, lastMove, fn) {
 
                     }
                 }
-                console.log("captured: " + captureCount);
+                //console.log("captured: " + captureCount);
                 fn(captureCount);
             });
 
@@ -148,13 +148,8 @@ function makeMove(board, y, x, colour, lastMove, fn) {
 
         postData = {
             "board": board,
-            "size": 3,
-            "last": {
-                "x": 0,
-                "y": 1,
-                "pass": false,
-                "c": 1
-            }
+            "size": board.length,
+            "last": lastMove
         };
 
         var req = http.request(option, callback);
