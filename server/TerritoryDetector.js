@@ -2,18 +2,18 @@
 //# Module Name: Territory detector
 //# Author: Chenchen Guo
 //# Email: guoc@uvic.ca
-//# Modified: 2016-07-05 7:15 PM
+//# Modified: 2016-07-10 8:50 PM
 //###############################################################################
 
 // Utility function, generate a board with random tokens
 function generateRandomBoard(size) {
-	var tempBoard;
+	var tempBoard = [];
 	for (var i = 0; i < size; i++) {
 		var row = [];
 		for (var j = 0; j < size; j++) {
 			row.push(Math.floor(Math.random() * 10) % 3);
 		}
-		board.push(row);
+		tempBoard.push(row);
 	}
 	return tempBoard;
 }
@@ -152,18 +152,24 @@ function getBorderOwner(borderList, board){
 	return owner;
 }
 
+// Return the list of coordinates of a specific token type
+function getTokenCoordinates(board, tokenType) {
+	var list = [];
+	for (var i = 0; i < board.length; i++) {
+		for (var j = 0; j < board.length; j++) {
+			if(board[i][j] == tokenType){
+				list.push({x: j, y: i});
+			}
+		}
+	}
+	return list;
+}
+
 // Return the territory information, including territory's size, owner, and corresponding coordinates
 function getTerritories(board){
 	var boardSize = board.length;
 	// Find the coordinates of all empty spaces
-	var zeroList = [];
-	for (var i = 0; i < board.length; i++) {
-		for (var j = 0; j < board[i].length; j++) {
-			if(board[i][j] == 0){
-				zeroList.push({x: j, y: i});
-			}
-		}
-	}
+	var zeroList = getTokenCoordinates(board, 0);
 
 	var territories = groupAdjacentTokens(zeroList);
 	var territoryList = [];
@@ -180,20 +186,90 @@ function getTerritories(board){
 	return territoryList;
 }
 
-// //====================================================================
-// // Sample Usage (Local)
-// //====================================================================
-// var board = [[0, 1, 2, 0, 0, 0, 0, 0, 0],
-// 			 [0, 1, 1, 0, 0, 0, 0, 1, 0],
-// 			 [1, 2, 2, 0, 0, 0, 1, 0, 2],
-// 			 [2, 0, 0, 1, 0, 1, 2, 2, 0],
-// 			 [0, 0, 0, 0, 2, 0, 1, 1, 2],
-// 			 [0, 0, 0, 0, 0, 0, 0, 2, 0],
-// 			 [0, 1, 1, 0, 2, 0 ,0 ,2, 1],
-// 			 [2, 2, 2, 1, 0, 0, 0, 1, 0],
-// 			 [0, 0, 0, 0, 0, 0, 0, 0, 0]];
-//
+// Return tokens that could be captured
+function getCapturedTokens(board) {
+	var boardSize = board.length;
+	//Find the coordinates of all black tokens
+	var blackList = getTokenCoordinates(board, 1);
+	
+	var blackArmies = groupAdjacentTokens(blackList);
+	var capturedBlackArmyList = [];
+	for (var i = 0; i < blackArmies.length; i++) {
+		var army = blackArmies[i];
+		var size = army.length;
+		var borderOwner = getBorderOwner(getBorderOfGroup(army, boardSize), board);
+		
+		if(borderOwner == 2){
+			// It's completely surrounded by white tokens, thus it can be captured 
+			capturedBlackArmyList.push({
+				armyOwner: 1,
+				capturedBy: 2,
+				size: size,
+				listOfCoordinates: army
+			})
+		}
+	}
+
+	var whiteList = getTokenCoordinates(board, 2);
+	
+	var whiteArmies = groupAdjacentTokens(whiteList);
+	var capturedWhiteArmyList = [];
+	for (var i = 0; i < whiteArmies.length; i++) {
+		var army = whiteArmies[i];
+		var size = army.length;
+		var borderOwner = getBorderOwner(getBorderOfGroup(army, boardSize), board);
+		
+		if(borderOwner == 1){
+			// It's completely surrounded by black tokens, thus it can be captured 
+			capturedWhiteArmyList.push({
+				armyOwner: 2,
+				capturedBy: 1,
+				size: size,
+				listOfCoordinates: army
+			})
+		}
+	}
+
+	return {capturedBlackArmyList: capturedBlackArmyList, capturedWhiteArmyList: capturedWhiteArmyList};
+}
+
+function isSuicide(board, x, y, colour) {
+	var surrounding = getBorderOwner(getBorderOfGroup([{x: x, y: y}], board.length), board);
+	if (colour == 1 && surrounding == 2 || colour == 2 && surrounding == 1){
+		return true;
+	}else{
+		return false;
+	}
+}
+
+
+//====================================================================
+// Sample Usage (Local)
+//====================================================================
+// var board = [[1, 1, 2, 0, 0, 0, 0, 0, 0, 1, 1, 2, 0, 0, 0, 0, 0, 0, 1],
+// 			 [0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 2],
+// 			 [1, 2, 2, 0, 0, 0, 1, 0, 2, 1, 2, 2, 0, 0, 0, 1, 0, 2, 0],
+// 			 [2, 0, 0, 1, 0, 1, 2, 2, 0, 2, 0, 0, 1, 0, 1, 2, 2, 0, 0],
+// 			 [0, 0, 0, 0, 2, 0, 1, 1, 2, 0, 0, 0, 0, 2, 0, 1, 1, 2, 2],
+// 			 [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0],
+// 			 [0, 1, 1, 0, 2, 0 ,0 ,2, 1, 0, 1, 1, 0, 2, 0 ,0 ,2, 1, 1],
+// 			 [2, 2, 2, 1, 0, 0, 0, 1, 0, 2, 2, 2, 1, 0, 0, 0, 1, 0, 2],
+// 			 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+// 			 [0, 1, 1, 0, 2, 0 ,0 ,2, 1, 0, 1, 1, 0, 2, 0 ,0 ,2, 1, 2],
+// 			 [2, 2, 2, 1, 0, 0, 0, 1, 0, 2, 2, 2, 1, 0, 0, 0, 1, 0, 2],
+// 			 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+// 			 [2, 0, 0, 1, 0, 1, 2, 2, 0, 2, 0, 0, 1, 0, 1, 2, 2, 0, 2],
+// 			 [0, 0, 0, 0, 2, 0, 1, 1, 2, 0, 0, 0, 0, 2, 0, 1, 1, 2, 2],
+// 			 [0, 0, 0, 1, 1, 1, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 2],
+// 			 [0, 1, 1, 0, 2, 2 ,2 ,1, 2, 0, 1, 1, 0, 2, 0 ,0 ,2, 1, 1],
+// 			 [2, 0, 0, 1, 1, 1, 1, 2, 1, 2, 0, 0, 1, 0, 1, 2, 2, 0, 2],
+// 			 [0, 0, 0, 0, 2, 0, 1, 1, 2, 0, 0, 0, 0, 2, 0, 1, 1, 2, 2],
+// 			 [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0]];
+
 // console.log(getTerritories(board));
+// console.log(getCapturedTokens(board));
+// console.log(isSuicide(board, 8, 16, 1));
+
 
 // //====================================================================
 // // Sample Usage (Cross File)
@@ -211,4 +287,6 @@ function getTerritories(board){
 //
 // console.log(territoryDetector.getTerritories(board));
 
-module.exports = {getTerritories : getTerritories};
+module.exports = {getTerritories	:	getTerritories,
+				getCapturedTokens	:	getCapturedTokens,
+						isSuicide	:	isSuicide};
