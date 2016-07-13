@@ -260,10 +260,10 @@ function calculateScore(board, capturedTokens1, capturedTokens2) {
 
 	for(var i = 0; i < board.length; i++){
 		for(var j = 0; j < board.length; j++){
-			if(board[j][i] == 1){
+			if(board[i][j] == 1){
 				token_Num_Black++;
 			}
-			if(board[j][i] == 2){
+			if(board[i][j] == 2){
 				token_Num_White++;
 			}
 		}
@@ -319,10 +319,12 @@ function applyMove(prevBoard, currBoard, tempBoard) {
 	// move currBoard data to prevBoard and
 	// tempBoard to currBoard
 	// return boardArrayToList(currBoard)
-	prevBoard[0] = currBoard[0];
-	prevBoard[1] = currBoard[1];
-	currBoard[0] = tempBoard[0];
-	currBoard[1] = tempBoard[1];
+	for (var i = 0; i < prevBoard.length; i++) {
+		for (var j = 0; j < prevBoard[i].length; j++) {
+			prevBoard[i][j] = currBoard[i][j];
+			currBoard[i][j] = tempBoard[i][j];
+		}
+	}
 	boardArrayToList(currBoard);
 }
 
