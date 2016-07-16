@@ -5,9 +5,9 @@ var gameboard = require('./server/gameboard');
 describe('gameboard', function() {
 	describe('#init3Boards', function () {
 		it('should initialize three 2D arrays with 0\'s', function () {
-			var board1;
-			var board2;
-			var board3;
+			var board1=[];
+			var board2=[];
+			var board3=[];
 			var board = [ [0, 0, 0], [0, 0, 0], [0, 0, 0] ];
 
 			gameboard.init3Boards(3, board1, board2, board3);
