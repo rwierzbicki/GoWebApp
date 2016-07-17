@@ -189,6 +189,14 @@ describe('gameboard', function() {
 
 			assert.deepEqual(prevBoard, [ [1, 0], [1, 0] ]);
 			assert.deepEqual(currBoard, [ [1, 1], [1, 2] ]);
+
+			prevBoard = [ [0, 0, 0], [0, 1, 0], [0, 0, 0] ];
+			currBoard = [ [2, 1, 1], [2, 0, 1], [0, 2, 0] ];
+			tempBoard = [ [1, 1, 0], [1, 2, 1], [0, 0, 1] ];
+			gameboard.applyMove(prevBoard, currBoard, tempBoard);
+
+			assert.deepEqual(prevBoard, [ [2, 1, 1], [2, 0, 1], [0, 2, 0] ]);
+			assert.deepEqual(currBoard, [ [1, 1, 0], [1, 2, 1], [0, 0, 1] ]);
 		});
 	});
 });
