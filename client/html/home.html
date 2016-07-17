@@ -29,20 +29,21 @@
 	  	<div id="navigation-bar">
 		  	<nav class="navbar navbar-default">
 		  		<div class="container">
-			  		<div class="navbar-header">
-			          	<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-				            <span class="sr-only">Toggle navigation</span>
-				            <span class="icon-bar"></span>
-				            <span class="icon-bar"></span>
-				            <span class="icon-bar"></span>
-			         	</button>
+			  		<div class="nav navbar-header">
 			         	<a id="logo" class="navbar-brand home-button initially-hidden" href="#home">Go Online</a>
 		       		</div>
-		  			<div id="navbar" class="navbar-collapse collapse">
-			          	<ul class="nav navbar-nav pull-right">
-			            	<li><a href="#loginModal" class="login-button" data-toggle="modal">Login</a></li>
-			          	</ul>
-			        </div>
+		          	<ul class="nav navbar-nav pull-right">
+		            	<li><a href="#loginModal" id="login-button" class="login-button" data-toggle="modal">Login</a></li>
+		            </ul>
+		            <ul class="nav navbar-nav pull-right initially-hidden">
+	            		<li class="dropdown">
+	            			<a href="#" id="username-button" class="dropdown-toggle" data-toggle="dropdown">User</a>
+	            			<ul class="dropdown-menu">
+	            				<li><a href="#" id="game-history-button">Game History</a></li>
+	            				<li><a href="#" id="logout-button">Logout</a></li>
+	            			</ul>
+	            		</li>
+		          	</ul>
 		  		</div>
 		  	</nav>
 	  	</div>
@@ -87,41 +88,39 @@
 
 		<!--============================= GAME SETUP PAGE =============================-->
 
-	    <div id="game-setup-page" class="page-section initially-hidden">
-		  	<div class="container theme-showcase" role="main">
-				<h1>New Game</h1>
-				<br>
-				
-				<form id="game-setup-form">
+	    <div id="game-setup-page" class="page-section initially-hidden container">
+			<h1>New Game</h1>
+			<br>
+			
+			<form id="game-setup-form">
 
-					<p><b>Board size</b></p>
-					<div class="btn-group" data-toggle="buttons">
-						<label class="btn btn-default active">
-							<input type="radio" name="board-size-radio" value=9 autocomplete="off" checked> 9x9
-						</label>
-						<label class="btn btn-default">
-							<input type="radio" name="board-size-radio" value=13 autocomplete="off"> 13x13
-						</label>
-						<label class="btn btn-default">
-							<input type="radio" name="board-size-radio" value=19 autocomplete="off"> 19x19
-						</label>
-					</div>
-					<br><br>
+				<p><b>Board size</b></p>
+				<div class="btn-group" data-toggle="buttons">
+					<label class="btn btn-default active">
+						<input type="radio" name="board-size-radio" value=9 autocomplete="off" checked> 9x9
+					</label>
+					<label class="btn btn-default">
+						<input type="radio" name="board-size-radio" value=13 autocomplete="off"> 13x13
+					</label>
+					<label class="btn btn-default">
+						<input type="radio" name="board-size-radio" value=19 autocomplete="off"> 19x19
+					</label>
+				</div>
+				<br><br>
 
-					<p><b>Play mode</b></p>
-					<div class="btn-group" data-toggle="buttons">
-						<label class="btn btn-default active">
-							<input type="radio" name="play-mode-radio" value="hotseat" autocomplete="off" checked> Local Multiplayer
-						</label>
-						<label class="btn btn-default">
-							<input type="radio" name="play-mode-radio" value="single" autocomplete="off"> 1 Player
-						</label>
-					</div>
-					<br><br><br>
+				<p><b>Play mode</b></p>
+				<div class="btn-group" data-toggle="buttons">
+					<label class="btn btn-default active">
+						<input type="radio" name="play-mode-radio" value="hotseat" autocomplete="off" checked> Local Multiplayer
+					</label>
+					<label class="btn btn-default">
+						<input type="radio" name="play-mode-radio" value="single" autocomplete="off"> 1 Player
+					</label>
+				</div>
+				<br><br><br>
 
-					<input id="submit-options-button" class="btn btn-default" value="Let's Go!">
-				</form>
-		    </div>
+				<input id="submit-options-button" class="btn btn-default" value="Let's Go!">
+			</form>
 	    </div>
 
 	    <!--================================== GAME PAGE ================================-->
@@ -162,6 +161,12 @@
 
 			</div>
 		</div>
+
+		<!--=================================GAME HISTORY================================-->
+
+		<div id="history-page" class="page-section initially-hidden container">
+            <h2>Game History</h2><br>
+	    </div>
 
 
 	    <!-- Bootstrap core JavaScript

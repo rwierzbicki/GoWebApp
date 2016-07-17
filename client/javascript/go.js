@@ -39,9 +39,25 @@ function onTokenModalOpened(event) {
  *	 Loads each player's name and token onto the screen
  */
 function updatePlayerInfo() {
-	document.getElementById('p1-name').innerHTML = "Player 1";
+	// if player 1 signed in, use username else "Player 1"
+	if (username1)
+		document.getElementById('p1-name').innerHTML = username1;
+	else
+		document.getElementById('p1-name').innerHTML = "Player 1";
+
 	document.getElementById('p1-token').src = PLAYER_1_TOKEN;
-	document.getElementById('p2-name').innerHTML = "Player 2";
+
+	// if player 2 signed in, use username else if
+	// hotseat, "Player 2", if not hotseat, "CPU"
+	if (username2)
+		document.getElementById('p2-name').innerHTML = username2;
+	else {
+		if (board.hotseat)
+			document.getElementById('p2-name').innerHTML = "Player 2";
+		else
+			document.getElementById('p2-name').innerHTML = "CPU";
+	}
+
 	document.getElementById('p2-token').src = PLAYER_2_TOKEN;
 }
 
@@ -94,7 +110,8 @@ function onClickNewToken(event) {
 /*
 * @param container {div DOM} the element in which the board will be created
 */
-function renderNewGameBoard(container) {
+function renderNewGameBoard() {
+	$('#gameboard').empty();
 	var svg = makeGameBoard();
 	
 	// tokens
@@ -104,7 +121,7 @@ function renderNewGameBoard(container) {
     	}
     }
 
-	container.append(svg);
+	$('#gameboard-container').append(svg);
 };
 
 // TODO: implement
