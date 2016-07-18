@@ -1,3 +1,5 @@
+var territoryDetector = require('./TerritoryDetector');
+
 // Token colours
 const NONE = 0;
 const BLACK = 1;
@@ -63,8 +65,31 @@ function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard,
  */
 
 function suicide(board, x, y, colour) {
-	// if each board spot around (x,y) in board is opponent colour, return false, else true
+	var oppColour = (colour === 1? 2 : 1);
+
+    var dx = [-1, 0, 1, 0];
+    var dy = [0, 1, 0, -1];
+
+    for (var direction = 0; direction < 4; direction++) {
+        var neighbourX = x + dx[direction];
+        var neighbourY = y + dy[direction];
+        if (inBounds(board, neighbourX, neighbourY) && board[neighbourY][neighbourX] !== oppColour) {
+            return false;
+        }
+    }
+
+    return true;
 	
+}
+
+/**
+ * @param board {2D array}
+ * @param x {int} x coordinate
+ * @param y {int} y coordinate
+ * @return {Boolean} true if (x,y) is in the board
+ */
+function inBounds(board, x, y) {
+    return (y >= 0 && y < board.length && x >= 0 && x < board.length);
 }
 
 /**
@@ -235,12 +260,18 @@ function calculateScore(board, capturedTokens1, capturedTokens2) {
  * @return territory count { [player1Territory player2Territory ] }
  */
 function countTerritories(board) {
-	// Go through 2D array. For each board space equal to NONE,
-	// for each neigbour, if not NONE record it say WHITE, if
-	// NONE visit that neighbour. If a neighbour is encountered
-	// which is neither NONE nor WHITE, the territory belongs to
-	// no one. If all neighbours are either NONE or WHITE the 
-	// spaces which are NONE are WHITE's territory
+	var territories = territoryDetector.getTerritories(board);
+
+	var count = [0, 0];
+
+	for (var i = 0; i < territories.length; i++) {
+		if (territories[i].owner === BLACK) {
+			count[0] += territories[i].size;
+		} else if (territories[i].owner === WHITE) {
+			count[1] += territories[i].size;
+		}
+	}
+	return count;
 }
 
 /**
