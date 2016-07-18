@@ -4,6 +4,8 @@ var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
 var defaultToken = ['raccon', 'fox'];
+var anonymousUserObjectID = null;
+var anonymousUserPassword = 'lfcd61tavjvrzwnx';
 
 class DBInterface{
 	constructor(u, p, db, host, port){
@@ -127,7 +129,7 @@ class DBInterface{
 						// Simply switch to the new account
 						callback(false);
 					}else{
-						// Else, append or overwrite the dstination object
+						// Else, append or overwrite the destination object
 						var modificationObject = {
 							'tokenId' : srcObj.tokenId,
 							'currentGame' : srcObj.currentGame,
@@ -136,6 +138,14 @@ class DBInterface{
 						_this.modifyAccountInformation(dstID, modificationObject, function(modifyErr, result){
 							assert.equal(modifyErr, null);
 							callback(true);
+						});
+						// Update the temporary ObjectIDs in the relevant game history
+						var gameCollection = _this._db.collection('gamecollection');
+						gameCollection.update({'player1' : srcObj}, {$set: {'player1' : dstObj}}, function(err, result){
+							assert.equal(err, null);
+						});
+						gameCollection.update({'player2' : srcObj}, {$set: {'player2' : dstObj}}, function(err, result){
+							assert.equal(err, null);
 						});
 					}
 				});
@@ -159,7 +169,7 @@ class DBInterface{
 		});
 	}
 
-	newGame(userAccountObjectID, boardSize, gameMode, callback){
+	newGame(userAccountObjectID, opponentAccountObjectID, boardSize, gameMode, tokenType, callback){
 		var _this = this;
 		this.connect(function(){
 			var collection = _this._db.collection('users');
@@ -167,12 +177,12 @@ class DBInterface{
 				if(!user){
 					callback(null);
 				}else{
-					var gameHistory = user.gameHistory;
+					var userGameHistory = user.gameHistory;
 					var gameCollectionObject = {
 						"date": Date.now(),
 						"gameMode" : 0,
-						"player1": "mystigan",
-						"player2": "tigger342",
+						"player1": tokenType == 1? userAccountObjectID: (opponentAccountObjectID? opponentAccountObjectID: anonymousUserObjectID),
+						"player2": tokenType == 1? (opponentAccountObjectID? opponentAccountObjectID: anonymousUserObjectID): userAccountObjectID,
 						"boardSize": boardSize,
 						"finished": false,
 						"currPlayer": 1,
@@ -182,8 +192,39 @@ class DBInterface{
 						"score2": 0,
 						"moveHistory": []
 					}
-					callback(infoObj);
+					var gameCollection = _this._db.collection('gamecollection');
+					gameCollection.insertOne(gameCollectionObject, function(insertErr, result){
+						assert.equal(insertErr, null);
+						var newGameDocumentID = result.insertedId;
+						userGameHistory.push(newGameDocumentID);
+						collection.updateOne({_id : userAccountObjectID}, {$set: {gameHistory : userGameHistory}}, 
+							function(updateErr, result){
+								assert.equal(updateErr, null);
+								callback(newGameDocumentID);
+						});
+						if(opponentAccountObjectID != null){
+							collection.findOne({_id : opponentAccountObjectID}, function(oppFindErr, oppUser){
+								var opponentGameHistory = oppUser.gameHistory;
+								opponentGameHistory.push(newGameDocumentID);
+								collection.updateOne({_id : opponentAccountObjectID}, {$set: {gameHistory : opponentGameHistory}}, 
+									function(oppUpdateErr, result){
+										assert.equal(oppUpdateErr, null);
+								});
+							});
+						}						
+					});
 				}
+			});
+		});
+	}
+
+	getGameObject(gameObjectID, callback){
+		var _this = this;
+		this.connect(function(){
+			var gameCollection = _this._db.collection('gamecollection');
+
+			collection.findOne({_id : gameObjectID}, function(findErr, gameObject){
+				callback(gameObject);
 			});
 		});
 	}
@@ -197,6 +238,14 @@ class DBInterface{
 	// Initialize the database with basic documents and collections
 	init(){
 		// Put initializations here if there are any
+		this.authenticateUser('anonymous', 'lfcd61tavjvrzwnx', function(userAccountObjectID, statusCode){
+			anonymousUserObjectID = userAccountObjectID;
+			if(statusCode == 2){
+				console.log('Database initialization completed.');
+			}else{
+				console.log('Database structure verified');
+			}
+		});
 	}
 
 	// Remove the database "go". Use for debugging purpose only.

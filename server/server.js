@@ -31,6 +31,7 @@ app.listen(30094, function() {
 
 /* =========================================== */
 var conenctionList = {};
+var gameLogic = require('./gameboard.js');
 var dbInterface = require('./DBInterface.js');
 var assert = require('assert');
 var ObjectID = require('mongodb').ObjectID;
@@ -43,6 +44,7 @@ db.connect(function(error){
 		console.log('Database connection failed');
 	}else{
 		console.log('Database connection established');
+		db.init();
 	}
 });
 
@@ -53,7 +55,14 @@ io.sockets.on('connection', function(socket){
 	var isLoggedIn = false;
 	var userObjID = null;
 	var username = null;
+	var opponentAccountObjectID = null;
 
+	var lastBoard = null;
+	var gameBoard = null;
+	var tempBoard = null;
+	var lastMove = null;
+	var player1Passed = false;
+	var player2Passed = false;
 
 	socket.on('auth', function(data, response){
 		var credential = JSON.parse(data);
@@ -112,16 +121,25 @@ io.sockets.on('connection', function(socket){
 		var gameID = parameterObject.gameID;
 		var gameParameters = parameterObject.gameParameters;
 
+		var resumeData = function(gameObjectID){
+
+		}
+
 		if(gameID){
 			// Continue a specific game
 			console.log('Continue the game: ' + gameID);
+			resumeData(gameID);
 			response('Cont.');
 		}else{
 			// Start a new game
 			console.log('Start a new game');
 			var boardSize = gameParameters.boardSize;
 			var playMode = gameParameters.playMode;
-			
+			var tokenType = gameParameters.tokenType;
+
+			db.newGame(userObjID, opponentAccountObjectID, boardSize, playMode, tokenType, function(newGameObjectID) {
+				resumeData(newGameObjectID);
+			});
 			response('New');
 		}
 	});
@@ -170,7 +188,7 @@ io.sockets.on('connection', function(socket){
 			}else if(command == 'pvt'){
 				var user = args[1];
 				var msg = args[2];
-			 	if(conenctionList[user] == undefined){
+			 	if(conenctionList[user] == undefined){z
 					socket.emit('publish', 'Specified user does not exist');
 				}else{
 					conenctionList[user].emit('publish', '[Private @ ' + socket.id + ']: ' + msg);

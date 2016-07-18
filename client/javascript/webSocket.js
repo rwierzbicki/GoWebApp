@@ -1,5 +1,8 @@
 var socket = io.connect('http://127.0.0.1:10086');
 var accountInfo = null;
+var currentGameMode = null;
+var currentPlayer = null;
+var currentBoard = null;
 
 // Authentication function
 function auth(username, password, callback){
@@ -117,13 +120,17 @@ function delCredentialCookie(){
 // boardSize: size of the board
 // playMode: 0: Local 1: AI
 // token: The token type (black == 1/white == 2)
-function onNewGameButtonClick(boardSize, playMode, token){
+function onNewGameButtonClick(boardSize, playMode, tokenType){
 	var gameParameters = {
 		boardSize : boardSize,
 		playMode : playMode,
-		token : token
+		tokenType : tokenType
 	};
 
+}
+
+function updateGameStatus(){
+	socket.emit();
 }
 
 socket.on('publish', function(data) {
@@ -139,7 +146,7 @@ socket.on('connect', function(){
 					// There's an unfinished game, continue automatically
 					continueGame(accountInfoObj.currentGame, function(result){
 						// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
-						console.log('Unfinished game detected, automatically continue.');
+						console.log('Unfinished game detected, automatically resume.');
 					});
 				}
 				var player1TokenID = accountInfoObj.tokenId[0];
