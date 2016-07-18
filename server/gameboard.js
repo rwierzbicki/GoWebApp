@@ -16,7 +16,21 @@ var http = require('http');
  * @param board3 {obj}
  */
 function init3Boards(size, board1, board2, board3) {
-	
+
+
+    var i = 0;
+    var j = 0;
+
+    for(i=0;i<size;i++){
+        var temp = [];
+        for(j=0;j<size;j++){
+            temp.push(0);
+        }
+        board1.push(temp);
+        board2.push(temp);
+        board3.push(temp);
+    }
+
 }
 
 /**
@@ -28,6 +42,8 @@ function init3Boards(size, board1, board2, board3) {
  * @param x {int} x coordinate of token
  * @param y {int} y coordinate of token
  * @param colour {int} colour of token
+ * @param lastMove {x: y: c: pass: } last token played
+ * @param fn {function} a callback function that takes status as input
  * @return status code / captured tokens {int}
  *		Error codes are negative
  *		Positive or 0 is number of captured tokens
@@ -36,21 +52,44 @@ function init3Boards(size, board1, board2, board3) {
  *		-2 - reverts board state
  *		-3 - suicide
  */
-function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard, x, y, colour) {
-	/* 
-	if position taken in currBoard
-		return -1
+function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard, x, y, colour, lastMove, fn) {
+	 
+	//if position taken in currBoard
+	//	return -1
+    //CASE 1: position taken
+    if(currBoard[y][x] !== 0){
+        fn(-1);
+        return;
+    }
+
 	
-	tempBoard = copy of board
-	capturedTokens = makeMove(tempBoard, x, y, colour)
+	//tempBoard = copy of board
+	//capturedTokens = makeMove(tempBoard, x, y, colour)
+
+        makeMove(tempBoard,x,y,colour,lastMove,function(res){
+            
+            //CASE 2: suicidal
+            if(res.captured === 0){
+                if(suicide(currBoard, x,y,colour)){
+                    //status = -3;
+                    fn(-3);
+                }
+            //CASE 3: revert board
+            }else if(revertsGameBoard(tempBoard, prevBoard, x, y, colour)){
+                fn(-2);
+            //CASE 4: return captured tokens
+            }else{
+                fn(res.captured);
+            }
+
+        });
+	//if revertsBoard(tempBoard, prevBoard, x, y, colour)
+	//	return -2
+	//if suicide(tempBoard, x, y, colour)
+	//	return -3
 	
-	if revertsBoard(tempBoard, prevBoard, x, y, colour)
-		return -2
-	if suicide(tempBoard, x, y, colour)
-		return -3
+	//return capturedTokens
 	
-	return capturedTokens
-	*/
 }
 
 /**
@@ -105,6 +144,16 @@ function inBounds(board, x, y) {
  */
 function revertsGameBoard(tempBoard, prevBoard, x, y, colour) {
 	// if tempBoard is same as prevBoard, return true
+    var i=0;
+    var j=0;
+    for(i = 0;i< prevBoard.length;i++){
+        for(j = 0;j<prevBoard.length;j++){
+            if(tempBoard[i][j] !== prevBoard[i][j]){
+                return false;
+            }
+        }
+    }
+    return true;
 }
 
 /**
@@ -142,7 +191,11 @@ function makeMove(board, y, x, colour, lastMove, fn) {
 
             response.on('end', function () {
                 //console.log("data: " + str);
-
+                var returnObj = {
+                    captured : 0,
+                    capturedTokens : [],
+                    board: [],
+                };
                 var jsonObj = JSON.parse(str);
                 //add code here
                 for (i = 0; i < jsonObj.armies.length; i++) {
@@ -151,21 +204,23 @@ function makeMove(board, y, x, colour, lastMove, fn) {
                         // if the only liberty is the place that the token is going to be placed
                         if (jsonObj.armies[i].liberties[0][0] === x && jsonObj.armies[i].liberties[0][1] === y) {
                             //place the token and capture this army
-                            board[y][x] = colour;
-                            captured = true;
+                            board[x][y] = colour;
+                            
                             for (var j = 0; j < jsonObj.armies[i].size; j++) {
                                 var tempx = jsonObj.armies[i].tokens[j].position[0];
                                 var tempy = jsonObj.armies[i].tokens[j].position[1];
-                                board[tempy][tempx] = 0;
-                                captureCount++;
-
+                                board[tempx][tempy] = 0;
+                                returnObj.captured++;
+                                returnObj.capturedTokens.push([tempy,tempx]);
                             }
+
                         }
 
                     }
                 }
+                returnObj.board = board;
                 //console.log("captured: " + captureCount);
-                fn(captureCount);
+                fn(returnObj);
             });
 
 
@@ -244,13 +299,46 @@ function boardListToArray(boardList, boardArray) {
  * Calculates both players' scores
  *
  * @param board {2D array}
- * @param capturedTokens1 {int} player 1's captured tokens
- * @param capturedTokens1 {int} player 2's captured tokens
+ * @param capturedTokens1 {int} player 1's captured tokens(Black)
+ * @param capturedTokens1 {int} player 2's captured tokens(White)
  * @return scores { [player1Score player2Score ] }
  */
 function calculateScore(board, capturedTokens1, capturedTokens2) {
 	// score = army tokens + captured tokens + territory (use countTerritories()) + handicap (for white)
-	// handicap scores: 9x9 - 2.5 points, 13x13 - 4.5 points, 19x19 - 7.5 points
+	// handicap scores: 9x9 - 2.5 points, 13x13 - 4.5 points, 19x19 - 7.5 points(Add points for white)
+	//score[0] is black, score[1] is white
+	var score = [0, 0];
+	var token_Num_Black = 0;
+	var token_Num_White = 0;
+	var handicap = 0;
+	var count = countTerritories(board);
+
+	for(var i = 0; i < board.length; i++){
+		for(var j = 0; j < board.length; j++){
+			if(board[i][j] == 1){
+				token_Num_Black++;
+			}
+			if(board[i][j] == 2){
+				token_Num_White++;
+			}
+		}
+	}
+
+	if(board.length == 9){
+		handicap = 2.5;
+	}
+	if(board.length == 13){
+		handicap = 4.5;
+	}
+	if(board.length == 19){
+		handicap = 7.5;
+	}
+
+	score[0] = token_Num_Black + capturedTokens1 + count[0];
+	score[1] = token_Num_White + capturedTokens2 + count[1] + handicap;
+	
+
+	return score;
 }
 
 /**
@@ -286,6 +374,13 @@ function applyMove(prevBoard, currBoard, tempBoard) {
 	// move currBoard data to prevBoard and
 	// tempBoard to currBoard
 	// return boardArrayToList(currBoard)
+	for (var i = 0; i < prevBoard.length; i++) {
+		for (var j = 0; j < prevBoard[i].length; j++) {
+			prevBoard[i][j] = currBoard[i][j];
+			currBoard[i][j] = tempBoard[i][j];
+		}
+	}
+	boardArrayToList(currBoard);
 }
 
 module.exports = {

@@ -5,9 +5,9 @@ var gameboard = require('./server/gameboard');
 describe('gameboard', function() {
 	describe('#init3Boards', function () {
 		it('should initialize three 2D arrays with 0\'s', function () {
-			var board1;
-			var board2;
-			var board3;
+			var board1=[];
+			var board2=[];
+			var board3=[];
 			var board = [ [0, 0, 0], [0, 0, 0], [0, 0, 0] ];
 
 			gameboard.init3Boards(3, board1, board2, board3);
@@ -159,10 +159,10 @@ describe('gameboard', function() {
 				[0, 0, 1, 2, 0, 1, 0, 2, 2],
 				[0, 0, 0, 0, 0, 0, 2, 0, 0]
 			];
-			// score1 = handicap + armies + territory + captured tokens
-			var score1 = 2.5 + 20 + 9 + 4;
-			// score2 = armies + territory + captured tokens
-			var score2 = 20 + 13 + 8;
+			// score1 (black) = armies + territory + captured tokens
+			var score1 = 20 + 9 + 4;
+			// score2 (white) = handicap + armies + territory + captured tokens
+			var score2 = 2.5 + 20 + 13 + 8;
 			assert.deepEqual([score1, score2], gameboard.calculateScore(board, 4, 8));
 		});
 	});
@@ -189,6 +189,14 @@ describe('gameboard', function() {
 
 			assert.deepEqual(prevBoard, [ [1, 0], [1, 0] ]);
 			assert.deepEqual(currBoard, [ [1, 1], [1, 2] ]);
+
+			prevBoard = [ [0, 0, 0], [0, 1, 0], [0, 0, 0] ];
+			currBoard = [ [2, 1, 1], [2, 0, 1], [0, 2, 0] ];
+			tempBoard = [ [1, 1, 0], [1, 2, 1], [0, 0, 1] ];
+			gameboard.applyMove(prevBoard, currBoard, tempBoard);
+
+			assert.deepEqual(prevBoard, [ [2, 1, 1], [2, 0, 1], [0, 2, 0] ]);
+			assert.deepEqual(currBoard, [ [1, 1, 0], [1, 2, 1], [0, 0, 1] ]);
 		});
 	});
 });
