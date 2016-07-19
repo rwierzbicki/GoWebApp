@@ -23,6 +23,8 @@ window.onload = function() {
 
 function showHomePage() {
 	$('.initially-hidden').hide();
+	if (username1)	// if logged in, show username
+		$('#username-button').parent().parent().show();
 	$('#home-page').show();
 }
 
@@ -52,7 +54,6 @@ function startGame() {
 	showGamePage();
 }
 
-
 function submitLogin() {
 	var form = document.getElementById("login-form").elements;
 	if (userSigningIn == 1) {
@@ -75,6 +76,7 @@ function login() {
 }
 
 function logout() {
+	username1 = undefined;
 	$('#username-button').parent().parent().hide();
 	$('#login-button').parent().parent().show();
 	showHomePage();
