@@ -130,13 +130,18 @@
             	<div id="gameboard-container" class="col-md-8"></div>
             	<div class="col-md-4">
             		<table class="table">
-	            		<tr><td>
+	            		<tr id="player-1"><td>
 	            			<h4 id="p1-name"></h4>
 	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p1-token" class="player-token"/></a>
 	            		</td></tr>
-	            		<tr><td>
+	            		<tr id="player-2"><td>
 	            			<h4 id="p2-name"></h4>
 	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p2-token" class="player-token"/></a>
+	            		</td></tr>
+	            		<tr><td>
+	            			<button id="prev-board-button" class="btn btn-default initially-hidden">Previous</button>
+	            			<button id="next-board-button" class="btn btn-default initially-hidden">Next</button>
+	            			<div id="board-page-number"></div>
 	            		</td></tr>
 	            	</table>
             	</div>
@@ -166,6 +171,18 @@
 
 		<div id="history-page" class="page-section initially-hidden container">
             <h2>Game History</h2><br>
+         	<table class="table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Player 1</th>
+                        <th>Player 2</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                	<tbody id="game-history-table" >
+                </tbody>
+            </table>
 	    </div>
 
 
@@ -177,6 +194,7 @@
 
 	    <script src="javascript/svgFactory.js"></script>
 	    <script src="javascript/go.js"></script>
+	    <script src="javascript/history.js"></script>
 	    <script src="javascript/home.js"></script>
 
   	</body>

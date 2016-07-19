@@ -8,6 +8,10 @@
   margin-right: 98px;
 }
 
+.curr-player{
+  background-color: LightCyan;
+}
+
 .token-image {
   position: absolute;
 }

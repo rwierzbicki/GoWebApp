@@ -14,8 +14,11 @@ window.onload = function() {
 	$('#game-history-button').click(showHistoryPage);
 	$('#logout-button').click(logout);
 	$('#chooseTokenModal').on('show.bs.modal', onTokenModalOpened);
+	$('#prev-board-button').click(clickPrevBoard);
+	$('#next-board-button').click(clickNextBoard);
 
 	loadTokenSelectionModal();
+	loadGameHistory();
 }
 
 function showHomePage() {
@@ -43,10 +46,12 @@ function showHistoryPage() {
 
 function startGame() {
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
+	currPlayer = PLAYER_1;
 	renderNewGameBoard();
 	updatePlayerInfo();
 	showGamePage();
 }
+
 
 function submitLogin() {
 	var form = document.getElementById("login-form").elements;
@@ -60,7 +65,6 @@ function submitLogin() {
 		var password = form["password"].value;
 		// TODO authenticate user
 	}
-	
 }
 
 function login() {
