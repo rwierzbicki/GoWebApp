@@ -1,5 +1,3 @@
-var username1;
-var username2;
 var userSigningIn; //which player is signing in
 
 window.onload = function() {
@@ -23,7 +21,7 @@ window.onload = function() {
 
 function showHomePage() {
 	$('.initially-hidden').hide();
-	if (username1)	// if logged in, show username
+	if (player1.username)	// if logged in, show username
 		$('#username-button').parent().parent().show();
 	$('#home-page').show();
 }
@@ -36,6 +34,7 @@ function showNewGamePage() {
 
 function showGamePage() {
 	$('.page-section').hide();
+	$('#history-controls').hide();
 	$('#game-page').show();
 	$('#logo').show();
 }
@@ -46,9 +45,10 @@ function showHistoryPage() {
 	$('#logo').show();
 }
 
+
 function startGame() {
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
-	currPlayer = PLAYER_1;
+	currPlayer = 1;
 	renderNewGameBoard();
 	updatePlayerInfo();
 	showGamePage();
@@ -57,12 +57,12 @@ function startGame() {
 function submitLogin() {
 	var form = document.getElementById("login-form").elements;
 	if (userSigningIn == 1) {
-		username1 = form["username"].value;
+		player1.username = form["username"].value;
 		var password = form["password"].value;
 		// TODO authenticate user
 		login();
 	} else {
-		username2 = form["username"].value;
+		player2.username = form["username"].value;
 		var password = form["password"].value;
 		// TODO authenticate user
 	}
@@ -70,13 +70,13 @@ function submitLogin() {
 
 function login() {
 	$('#login-button').parent().parent().hide();
-	$('#username-button').html(username1 + '<b class="caret"></b>');
+	$('#username-button').html(player1.username + '<b class="caret"></b>');
 	$('#username-button').parent().parent().show();
 	updatePlayerInfo();
 }
 
 function logout() {
-	username1 = undefined;
+	player1.username = undefined;
 	$('#username-button').parent().parent().hide();
 	$('#login-button').parent().parent().show();
 	showHomePage();

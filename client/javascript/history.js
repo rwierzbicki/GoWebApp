@@ -149,6 +149,8 @@ function clickReplayGame(event) {
 	renderHistoryGameBoard();
 	updateHistoryInfo();
 	showGamePage();
+	// has to be after showGamePage() since that method hides it
+	$('#history-controls').show();
 }
 
 function clickPrevBoard(event) {
@@ -178,9 +180,9 @@ function renderHistoryGameBoard() {
     for (var row = 0; row < (board.size); row++) {
     	for (var col = 0; col < (board.size); col++) {
     		if (boardArr[row][col] == 1)
-    			svg.append(makeToken(col, row, board.sqSize, PLAYER_1_TOKEN, "token-image placed 1"));
+    			svg.append(makeToken(col, row, board.sqSize, player1.token, "token-image placed 1"));
     		else if (boardArr[row][col] == 2)
-    			svg.append(makeToken(col, row, board.sqSize, PLAYER_2_TOKEN, "token-image placed 2"));
+    			svg.append(makeToken(col, row, board.sqSize, player2.token, "token-image placed 2"));
     	}
     }
 
@@ -189,6 +191,8 @@ function renderHistoryGameBoard() {
 
 function updateHistoryInfo() {
 	currPlayer = (history.currHistoryIndex%2 == 0 ? 1 : 2);
+	player1.capturedTokens = history.list[history.currHistoryIndex].capturedTokens1;
+	player2.capturedTokens = history.list[history.currHistoryIndex].capturedTokens2;
 	updatePlayerInfo();
 	$('#board-page-number').html((history.currHistoryIndex+1) + "/" + history.list.length);
 }
