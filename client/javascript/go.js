@@ -9,16 +9,20 @@ TOKEN_IMGS = {
 
 // Variables
 
+var primary = 1;	// player who is the primary account holder
+
 player1 = {
 	username: null,
-	token: TOKEN_IMGS.raccoon,
-	capturedTokens: 0
+	token: "raccoon",
+	capturedTokens: 0,
+	passsed: false
 }
 
 player2 = {
 	username: null,
-	token: TOKEN_IMGS.fox,
-	capturedTokens: 0
+	token: "fox",
+	capturedTokens: 0,
+	passed: false,
 }
 
 var board = {
@@ -36,18 +40,18 @@ var currPlayer;
 var playerNewToken; // which player is changing their token
 
 /**
- * Loads each player's name and token onto the screen as well
- * as highlighting the current player
+ * Loads each player's name, token, captured tokens, and passed state onto
+ * the screen as well as highlighting the current player
  */
 function updatePlayerInfo() {
+
+	// USERNAME
+
 	// if player 1 signed in, use username else "Player 1"
 	if (player1.username)
 		document.getElementById('p1-name').innerHTML = player1.username;
 	else
-		document.getElementById('p1-name').innerHTML = "Player 1";
-
-	document.getElementById('p1-token').src = player1.token;
-	document.getElementById('p1-captured-tokens').innerHTML = player1.capturedTokens;
+		document.getElementById('p1-name').innerHTML = "Player 1";	
 
 	// if player 2 signed in, use username else if
 	// hotseat, "Player 2", if not hotseat, "CPU"
@@ -60,10 +64,32 @@ function updatePlayerInfo() {
 			document.getElementById('p2-name').innerHTML = "CPU";
 	}
 
-	document.getElementById('p2-token').src = player2.token;
-	document.getElementById('p2-captured-tokens').innerHTML = player2.capturedTokens;
+	// TOKEN
+	
+	document.getElementById('p1-token').src = TOKEN_IMGS[player1.token];
+	document.getElementById('p2-token').src = TOKEN_IMGS[player2.token];
 
-	// highlight current player's box
+	// CAPTURED TOKENS
+
+	document.getElementById('p2-captured-tokens').innerHTML = player2.capturedTokens;
+	document.getElementById('p1-captured-tokens').innerHTML = player1.capturedTokens;
+
+	// PASSED
+
+	if (player1.passed) {
+		$('#p1-pass-button').addClass("active");
+	} else {
+		$('#p1-pass-button').removeClass("active");
+	}
+
+	if (player2.passed) {
+		$('#p2-pass-button').addClass("active");
+	} else {
+		$('#p2-pass-button').removeClass("active");
+	}
+	
+	// HIGHLIGHT CURRENT PLAYER
+
 	if (currPlayer == 1) {	// if player 1 is current player
 		$('#player-1').addClass("curr-player");
 		$('#player-2').removeClass("curr-player");
@@ -73,6 +99,28 @@ function updatePlayerInfo() {
 	}
 }
 
+function clickPass(event) {
+	if (replay)
+		return;
+
+	if (currPlayer === 1 && event.target.id === "p1-pass-button") {	// if player 1 passed
+		player1.passed = true;
+		currPlayer = 2;
+	} else if (currPlayer === 2 && event.target.id === "p2-pass-button") {
+		if (player1.passed) {
+			player2.passed = true;
+			alert("This game is finished");	// TODO end game!
+		} else {
+			currPlayer = 1;
+		}
+	} else {
+		alert("You can only pass on your turn!");
+	}
+
+	updatePlayerInfo();
+	updateUnplacedTokens();
+}
+
 // load tokens into Token Selection Modal
 function loadTokenSelectionModal() {
 	var modalBody = document.getElementById('chooseTokenBody');
@@ -80,11 +128,11 @@ function loadTokenSelectionModal() {
 		var a = document.createElement('a');
 		var img = document.createElement('img');
 		img.src = TOKEN_IMGS[key];
-		img.id = TOKEN_IMGS[key];
+		img.id = key;
 		a.onclick = onClickNewToken;
 
 		// token is already being used
-		if (TOKEN_IMGS[key] === player1.token || TOKEN_IMGS[key] === player2.token ) {
+		if (key === player1.token || key === player2.token ) {
 			img.className = "choose-token-image taken";
 		} else {
 			img.className = "choose-token-image";
@@ -99,6 +147,7 @@ function onTokenModalOpened(event) {
 	playerNewToken = (event.relatedTarget.childNodes[0].id === "p1-token" ? 1 : 2);
 }
 
+// Clicked a new token image in the Token Selection modal
 function onClickNewToken(event) {
 	if (event.target.className === "choose-token-image taken") {
 		return;
@@ -108,26 +157,23 @@ function onClickNewToken(event) {
 		document.getElementById(player1.token).className = "choose-token-image";
 		player1.token = event.target.id;
 		document.getElementById(player1.token).className = "choose-token-image taken";
-		document.getElementById("p1-token").src = player1.token;
+		document.getElementById("p1-token").src = TOKEN_IMGS[player1.token];
 		if (playerNewToken === currPlayer)
-			swapUnplacedTokens(player1.token);
-		swapPlacedTokens(1, player1.token);
+			updateUnplacedTokens();
+		swapPlacedTokens(1, TOKEN_IMGS[player1.token]);
 	} else {
 		document.getElementById(player2.token).className = "choose-token-image";
 		player2.token = event.target.id;
 		document.getElementById(player2.token).className = "choose-token-image taken";
-		document.getElementById("p2-token").src = player2.token;
+		document.getElementById("p2-token").src = TOKEN_IMGS[player2.token];
 		if (playerNewToken === currPlayer)
-			swapUnplacedTokens(player2.token);
-		swapPlacedTokens(2, player2.token);
+			updateUnplacedTokens();
+		swapPlacedTokens(2, TOKEN_IMGS[player2.token]);
 	}
 
 	$('#chooseTokenModal').modal('hide');
 }
 
-/*
-* @param container {div DOM} the element in which the board will be created
-*/
 function renderNewGameBoard() {
 	$('#gameboard').empty();
 	var svg = makeGameBoard();
@@ -135,7 +181,7 @@ function renderNewGameBoard() {
 	// tokens
     for (var row = 0; row < (board.size); row++) {
     	for (var col = 0; col < (board.size); col++) {
-    		svg.append(makeToken(col, row, board.sqSize, player1.token, "token-image unplaced", onClickToken));
+    		svg.append(makeToken(col, row, board.sqSize, TOKEN_IMGS[player1.token], "token-image unplaced", onClickToken));
     	}
     }
 
@@ -146,15 +192,15 @@ function renderUnfinishedGameBoard() {
 	var boardState = board.state;
 	$('#gameboard').empty();
 	var svg = makeGameBoard();
-	var unplacedToken = (currPlayer == 1 ? player1.token : player2.token);
+	var unplacedToken = (currPlayer == 1 ? TOKEN_IMGS[player1.token] : TOKEN_IMGS[player2.token]);
 	
 	// tokens
     for (var row = 0; row < (board.size); row++) {
     	for (var col = 0; col < (board.size); col++) {
     		if (boardState[row][col] == 1)
-    			svg.append(makeToken(col, row, board.sqSize, player1.token, "token-image placed 1"));
+    			svg.append(makeToken(col, row, board.sqSize, TOKEN_IMGS[player1.token], "token-image placed 1"));
     		else if (boardState[row][col] == 2)
-    			svg.append(makeToken(col, row, board.sqSize, player2.token, "token-image placed 2"));
+    			svg.append(makeToken(col, row, board.sqSize, TOKEN_IMGS[player2.token], "token-image placed 2"));
     		else
     			svg.append(makeToken(col, row, board.sqSize, unplacedToken, "token-image unplaced", onClickToken));
     	}
@@ -165,11 +211,10 @@ function renderUnfinishedGameBoard() {
 
 function makeGameBoard() {
 	var size = board.size;
+	var sqSize = board.sqSize;
 
 	var svg = $(makeSVG("100%", "100%", "gameboard"));
 	
-	var sqSize = board.sqSize;
-
 	// board background
     svg.append(makeSquare(0, 0, "100%"));
 
@@ -188,20 +233,15 @@ function onClickToken(event) {
 	if (token.getAttribute("class") !== "token-image unplaced")
 		return;
 
-	token.setAttributeNS(null, "class", "token-image placed " + currPlayer);
+	token.setAttribute("class", "token-image placed " + currPlayer);
 	
 	if (board.hotseat) {
-		if (currPlayer == 1) {
-			currPlayer = 2;
-			var imgPath = player2.token;
-		} else {
-			currPlayer = 1;
-			var imgPath = player1.token;
-		}
+		currPlayer = (currPlayer === 1 ? 2 : 1);
 	}
 
+	player1.passed = false;
 	updatePlayerInfo();
-	swapUnplacedTokens(imgPath);
+	updateUnplacedTokens();
 	
 }
 
@@ -217,7 +257,8 @@ function swapPlacedTokens(player, newImage) {
 
 }
 
-function swapUnplacedTokens(imgPath) {
+function updateUnplacedTokens() {
+	var imgPath = (currPlayer == 1 ? TOKEN_IMGS[player1.token] : TOKEN_IMGS[player2.token]);
 	var unplacedTokens = document.getElementsByClassName('token-image unplaced');
 	for (var i = 0; i < unplacedTokens.length; i++)
 		unplacedTokens[i].setAttributeNS('http://www.w3.org/1999/xlink','href', imgPath);
@@ -244,4 +285,15 @@ function boardListToArray(size, boardList) {
 	}
 
 	return boardArr;
+}
+
+/**
+ * Returns a token image which is not already taken
+ * (more specifically, the next available token)
+ *
+ * @param token {key in TOKEN_IMGS} token which is already taken
+ */
+function getOtherToken(token) {
+	keys = Object.keys(TOKEN_IMGS);
+	return keys[(keys.indexOf(token)+1)%keys.length];
 }
