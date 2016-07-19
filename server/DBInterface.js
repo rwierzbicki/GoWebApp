@@ -180,12 +180,12 @@ class DBInterface{
 					var userGameHistory = user.gameHistory;
 					var gameCollectionObject = {
 						"date": Date.now(),
-						"gameMode" : 0,
+						"gameMode" : gameMode,
 						"player1": tokenType == 1? userAccountObjectID: (opponentAccountObjectID? opponentAccountObjectID: anonymousUserObjectID),
 						"player2": tokenType == 1? (opponentAccountObjectID? opponentAccountObjectID: anonymousUserObjectID): userAccountObjectID,
 						"boardSize": boardSize,
 						"finished": false,
-						"currPlayer": 1,
+						// "currPlayer": 1,
 						"capturedTokens1": 0,
 						"capturedTokens2": 0,
 						"score1": 0,
@@ -197,7 +197,7 @@ class DBInterface{
 						assert.equal(insertErr, null);
 						var newGameDocumentID = result.insertedId;
 						userGameHistory.push(newGameDocumentID);
-						collection.updateOne({_id : userAccountObjectID}, {$set: {gameHistory : userGameHistory}}, 
+						collection.updateOne({_id : userAccountObjectID}, {$set: {gameHistory : userGameHistory, currentGame: newGameDocumentID}}, 
 							function(updateErr, result){
 								assert.equal(updateErr, null);
 								callback(newGameDocumentID);
@@ -206,7 +206,7 @@ class DBInterface{
 							collection.findOne({_id : opponentAccountObjectID}, function(oppFindErr, oppUser){
 								var opponentGameHistory = oppUser.gameHistory;
 								opponentGameHistory.push(newGameDocumentID);
-								collection.updateOne({_id : opponentAccountObjectID}, {$set: {gameHistory : opponentGameHistory}}, 
+								collection.updateOne({_id : opponentAccountObjectID}, {$set: {gameHistory : opponentGameHistory, currentGame: newGameDocumentID}}, 
 									function(oppUpdateErr, result){
 										assert.equal(oppUpdateErr, null);
 								});
@@ -218,12 +218,51 @@ class DBInterface{
 		});
 	}
 
+	makeMove(gameObjectID, boardState, callback){
+		var _this = this;
+		this.connect(function(){
+			var gameCollection = _this._db.collection('gamecollection');
+
+			gameCollection.findOne({_id : gameObjectID}, function(findErr, gameObject){
+				var moveHistory = gameObject.moveHistory;
+				moveHistory.push(boardState);
+				gameCollection.updateOne({_id : gameObjectID}, {$set: {moveHistory : moveHistory}}, 
+					function(gameUpdateErr, result){
+						assert.equal(gameUpdateErr, null);
+						callback();
+				});
+			});
+		});
+	}
+
+	endGame(userAccountObjectID, opponentAccountObjectID, gameObjectID, gameRecord, callback){
+		var _this = this;
+		this.connect(function(){
+			var gameCollection = _this._db.collection('gamecollection');
+
+			gameCollection.updateOne({_id : gameObjectID}, {$set: gameRecord}, 
+				function(gameUpdateErr, result){
+					assert.equal(gameUpdateErr, null);
+				var userCollection = _this._db.collection('users');
+
+				userCollection.updateOne({_id : userAccountObjectID}, {$set: {currentGame : null}},
+					function(clearCurrError, result){
+						assert.equal(clearCurrError, null);
+						userCollection.updateOne({_id : (opponentAccountObjectID? opponentAccountObjectID: anonymousUserObjectID)}, {$set: {currentGame : null}}, function(clearCurrError2, result){
+							assert.equal(clearCurrError2, null);
+							callback();
+						});
+					});
+			});
+		});
+	}
+
 	getGameObject(gameObjectID, callback){
 		var _this = this;
 		this.connect(function(){
 			var gameCollection = _this._db.collection('gamecollection');
 
-			collection.findOne({_id : gameObjectID}, function(findErr, gameObject){
+			gameCollection.findOne({_id : gameObjectID}, function(findErr, gameObject){
 				callback(gameObject);
 			});
 		});

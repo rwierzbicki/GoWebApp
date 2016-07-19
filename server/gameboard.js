@@ -22,13 +22,17 @@ function init3Boards(size, board1, board2, board3) {
     var j = 0;
 
     for(i=0;i<size;i++){
-        var temp = [];
+        var temp1 = [];
+        var temp2 = [];
+        var temp3 = [];
         for(j=0;j<size;j++){
-            temp.push(0);
+            temp1.push(0);
+            temp2.push(0);
+            temp3.push(0);
         }
-        board1.push(temp);
-        board2.push(temp);
-        board3.push(temp);
+        board1.push(temp1);
+        board2.push(temp2);
+        board3.push(temp3);
     }
 
 }
@@ -66,13 +70,21 @@ function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard,
 	//tempBoard = copy of board
 	//capturedTokens = makeMove(tempBoard, x, y, colour)
 
+		for (var i = 0; i < currBoard.length; i++) {
+			for (var j = 0; j < currBoard[0].length; j++) {
+				tempBoard[i][j] = currBoard[i][j];
+			}
+		}
+
         makeMove(tempBoard,x,y,colour,lastMove,function(res){
-            
+            console.log(res);
             //CASE 2: suicidal
             if(res.captured === 0){
                 if(suicide(currBoard, x,y,colour)){
                     //status = -3;
                     fn(-3);
+                }else{
+                	fn(0);
                 }
             //CASE 3: revert board
             }else if(revertsGameBoard(tempBoard, prevBoard, x, y, colour)){
@@ -172,7 +184,8 @@ function makeMove(board, y, x, colour, lastMove, fn) {
     if (colour !== 0) {
 
         var option = {
-            host: "roberts.seng.uvic.ca",
+            // host: "roberts.seng.uvic.ca",
+            host: '127.0.0.1',
             port: "30000",
             path: "/util/findArmies",
             method: "POST",
@@ -186,7 +199,6 @@ function makeMove(board, y, x, colour, lastMove, fn) {
 
             response.on('data', function (chunk) {
                 str += chunk.toString();
-
             });
 
             response.on('end', function () {
@@ -197,7 +209,9 @@ function makeMove(board, y, x, colour, lastMove, fn) {
                     board: [],
                 };
                 var jsonObj = JSON.parse(str);
+                console.log(jsonObj);
                 //add code here
+                var captureOccurred = false;
                 for (i = 0; i < jsonObj.armies.length; i++) {
                     //if that armies has only one liberty AND color is different from armie
                     if (jsonObj.armies[i].liberties.length === 1 && (jsonObj.armies[i].colour != colour)) {
@@ -213,11 +227,16 @@ function makeMove(board, y, x, colour, lastMove, fn) {
                                 returnObj.captured++;
                                 returnObj.capturedTokens.push([tempy,tempx]);
                             }
-
+                            captureOccurred = true;
                         }
-
                     }
                 }
+
+                if(!captureOccurred){
+                	// if capture didn't occur, simply place the token
+                	board[x][y] = colour;
+                }
+
                 returnObj.board = board;
                 //console.log("captured: " + captureCount);
                 fn(returnObj);
@@ -226,11 +245,21 @@ function makeMove(board, y, x, colour, lastMove, fn) {
 
         }
 
+        var tempLastMove = {
+        	x : lastMove.pass? 0: lastMove.y,
+        	y : lastMove.pass? 0: lastMove.x,
+        	c : lastMove.pass? 0: lastMove.c,
+        	pass : lastMove.pass
+        };
+
         postData = {
             "board": board,
             "size": board.length,
-            "last": lastMove
+            "last": tempLastMove
         };
+
+        console.log(option);
+        console.log(postData);
 
         var req = http.request(option, callback);
 
@@ -380,7 +409,7 @@ function applyMove(prevBoard, currBoard, tempBoard) {
 			currBoard[i][j] = tempBoard[i][j];
 		}
 	}
-	boardArrayToList(currBoard);
+	return boardArrayToList(currBoard);
 }
 
 module.exports = {

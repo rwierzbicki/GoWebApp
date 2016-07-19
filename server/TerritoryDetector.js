@@ -171,8 +171,14 @@ function getTerritories(board){
 	// Find the coordinates of all empty spaces
 	var zeroList = getTokenCoordinates(board, 0);
 
+	if(zeroList.length == board.length * board[0].length){
+		// This means the entire board is empty
+		return [];
+	}
+	
 	var territories = groupAdjacentTokens(zeroList);
 	var territoryList = [];
+
 	for (var i = 0; i < territories.length; i++) {
 		var territory = territories[i];
 		var size = territory.length;

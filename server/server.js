@@ -31,8 +31,9 @@ app.listen(30094, function() {
 
 /* =========================================== */
 var conenctionList = {};
-var gameLogic = require('./gameboard.js');
+var gameLogicModule = require('./gameboard.js');
 var dbInterface = require('./DBInterface.js');
+var aiInterface = require('./aiInterface.js');
 var assert = require('assert');
 var ObjectID = require('mongodb').ObjectID;
 var io = require('socket.io').listen(10086);
@@ -56,13 +57,72 @@ io.sockets.on('connection', function(socket){
 	var userObjID = null;
 	var username = null;
 	var opponentAccountObjectID = null;
+	var currentGameID = null;
 
-	var lastBoard = null;
-	var gameBoard = null;
+	var prevBoard = null;
+	var currBoard = null; // 0: Local 1: AI (2: On-line)
 	var tempBoard = null;
 	var lastMove = null;
 	var player1Passed = false;
 	var player2Passed = false;
+	var gameMode = null;
+	var accountHolderTokenType = null;
+	var currentTurn = null;
+	var player1CapturedTokens = 0;
+	var player2CapturedTokens = 0;
+
+	var resumeData = function(gameObjectID, initRequired, callback){
+		db.getGameObject(gameObjectID, function(gameObject){
+			if(initRequired){
+				// If initialization is required
+				prevBoard = [];
+				currBoard = [];
+				tempBoard = [];
+				gameLogicModule.init3Boards(gameObject.boardSize, prevBoard, currBoard, tempBoard);
+				lastMove = {x: 0, y: 0, c: 0, pass : false};
+				gameMode = gameObject.gameMode;
+				currentTurn = 1;
+				accountHolderTokenType = (gameObject.player1.toString() == userObjID.toString())? 1: 2;
+				player1CapturedTokens = 0;
+				player2CapturedTokens = 0;
+				currentGameID = gameObjectID;
+			}
+			var latestGameBoard = gameObject.moveHistory[gameObject.moveHistory.length - 1];
+			console.log(latestGameBoard);
+			if(latestGameBoard){
+				// If last game board exist (i.e. the move history is not empty)
+				gameLogicModule.boardListToArray(latestGameBoard.board, currBoard);
+				lastMove = latestGameBoard.latestMove;
+				currentTurn = lastMove.c == 1? 2: 1;
+				player1Passed = latestGameBoard.player1Passed;
+				player2Passed = latestGameBoard.player2Passed;
+				player1CapturedTokens = latestGameBoard.capturedTokens1;
+				player2CapturedTokens = latestGameBoard.capturedTokens2;
+				
+				if(gameObject.moveHistory.length > 1){
+					// If previous game board exist (i.e. the length of move history is greater than 1)
+					var previousGameBoard = gameObject.moveHistory[gameObject.moveHistory.length - 2];
+					gameLogicModule.boardListToArray(previousGameBoard.board, prevBoard);
+				}
+			}
+			if(gameMode == 1 && (currentTurn != accountHolderTokenType)){
+
+			}
+			if(callback){
+				// delete the move history to reduce network traffic
+				delete gameObject['moveHistory'];
+				// Fetch the players' usernames and put them into gameObject before sending back to client
+				db.getAccountInfo(gameObject.player1, function(player1UserObj){
+					gameObject.player1 = player1UserObj.username;
+					db.getAccountInfo(gameObject.player2, function(player2UserObj){
+						gameObject.player2 = player2UserObj.username;
+						gameObject.accountHolderTokenType = accountHolderTokenType;
+						callback(gameObject);
+					});
+				});
+			}
+		});
+	}
 
 	socket.on('auth', function(data, response){
 		var credential = JSON.parse(data);
@@ -118,30 +178,114 @@ io.sockets.on('connection', function(socket){
 			return;
 		}
 		var parameterObject = data;
-		var gameID = parameterObject.gameID;
+		var unfinishedGameObjectID = parameterObject.gameID == null? null: ObjectID(parameterObject.gameID);
 		var gameParameters = parameterObject.gameParameters;
 
-		var resumeData = function(gameObjectID){
-
-		}
-
-		if(gameID){
+		if(unfinishedGameObjectID){
 			// Continue a specific game
-			console.log('Continue the game: ' + gameID);
-			resumeData(gameID);
-			response('Cont.');
+			console.log('Continue the game: ' + unfinishedGameObjectID);
+			resumeData(unfinishedGameObjectID, true, function(gameObject){
+				response(gameObject);
+			});
 		}else{
 			// Start a new game
 			console.log('Start a new game');
-			var boardSize = gameParameters.boardSize;
+			var newBoardSize = gameParameters.boardSize;
 			var playMode = gameParameters.playMode;
 			var tokenType = gameParameters.tokenType;
 
-			db.newGame(userObjID, opponentAccountObjectID, boardSize, playMode, tokenType, function(newGameObjectID) {
-				resumeData(newGameObjectID);
+			db.newGame(userObjID, opponentAccountObjectID, newBoardSize, playMode, tokenType, function(newGameObjectID) {
+				resumeData(newGameObjectID, true, function(gameObject){
+					response(gameObject);
+				});
 			});
-			response('New');
 		}
+	});
+
+	var makeMove = function(moveObj, callback){
+		var _makeMove = function(resultCode){
+			var tokenList = gameLogicModule.applyMove(prevBoard, currBoard, tempBoard);
+			var tokensCaptured = resultCode;
+			if(currentTurn == 1){
+				player1CapturedTokens += tokensCaptured;
+			}else{
+				player2CapturedTokens += tokensCaptured;
+			}
+			lastMove = moveObj;
+			var boardStateObject = {
+				board : tokenList,
+				latestMove : lastMove,
+				capturedTokens1 : player1CapturedTokens,
+				capturedTokens2 : player2CapturedTokens,
+				player1Passed : player1Passed,
+				player2Passed : player2Passed
+			};
+			currentTurn = (currentTurn == 1)? 2: 1;
+			db.makeMove(currentGameID, boardStateObject, function(){
+				console.log('Move saved');
+				callback(resultCode);
+			});
+		};
+
+		if(moveObj.c == currentTurn){
+			if(moveObj.pass){
+				if(moveObj.c == 1){
+					player1Passed = true;
+				}
+				if(moveObj.c == 2){
+					player2Passed = true;
+				}
+				_makeMove(0);
+				if(player1Passed && player2Passed){
+					console.log('Game over');
+					var scoreList = gameLogicModule.calculateScore(currBoard, player1CapturedTokens, player2CapturedTokens);
+					var player1Score = scoreList[0];
+					var player2Score = scoreList[1];
+					var gameRecord = {
+						finished : true,
+						capturedTokens1 : player1CapturedTokens,
+						capturedTokens2 : player2CapturedTokens,
+						score1 : player1Score,
+						score2 : player2Score
+					};
+					db.endGame(userObjID, opponentAccountObjectID, currentGameID, gameRecord, function(){
+						console.log('Game ended');
+					});
+
+				}
+			}else{
+				console.log('lastMove: ' + JSON.stringify(lastMove));
+				player1Passed = false;
+				player2Passed = false;
+				gameLogicModule.validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard, moveObj.x, moveObj.y, moveObj.c, lastMove, function(resultCode){
+					if(resultCode < 0){
+						callback(resultCode);
+					}else{
+						_makeMove(resultCode);
+					}
+				});
+			}
+		}else{
+			callback(-4);
+		}
+	}
+
+	socket.on('makeMove', function(moveObj, response){
+		console.log('Handling move: ' + JSON.stringify(moveObj));
+		console.log('====');
+
+		makeMove(moveObj, function(result){
+			if(gameMode == 1 && (currentTurn != accountHolderTokenType)){
+				// Need to fetch data from the AI server
+				aiInterface.getRandomMove(function(move){
+					makeMove(move, function(result){
+						assert.equal(result >= 0, true);
+						socket.emit('');
+					});
+				});
+			}
+			response(result);
+		});
 	});
 
 	socket.on('getAccountInfo', function(options, response){
@@ -152,6 +296,24 @@ io.sockets.on('connection', function(socket){
 		db.getAccountInfo(userObjID, function(info) {
 			response(info);
 		});
+	});
+
+	socket.on('update', function(data, response){
+		var updateResponse = {
+			board : currBoard,
+			player1Passed : player1Passed,
+			player2Passed : player2Passed,
+			player1CapturedTokens : player1CapturedTokens,
+			player2CapturedTokens : player2CapturedTokens,
+			lastMove : lastMove,
+			gameMode : gameMode,
+			accountHolderTokenType : accountHolderTokenType,
+			currentTurn : currentTurn
+		};
+		console.log('===Update===');
+		console.log(currBoard);
+		console.log('============');
+		response(updateResponse);
 	});
 
 	socket.on('control', function(command, response){

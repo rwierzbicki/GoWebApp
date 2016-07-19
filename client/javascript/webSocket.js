@@ -3,6 +3,11 @@ var accountInfo = null;
 var currentGameMode = null;
 var currentPlayer = null;
 var currentBoard = null;
+var player1Passed = false;
+var player2Passed = false;
+var accountHolderTokenType = null;
+var player1UserName = null;
+var player2UserName = null;
 
 // Authentication function
 function auth(username, password, callback){
@@ -51,9 +56,14 @@ function auth(username, password, callback){
 }
 
 function continueGame(gameID, gameParameters, callback) {
-	socket.emit('continue', {'gameID' : gameID, 'gameParameters': gameParameters}, function(result){
-		console.log(result);
-		callback(result);
+	socket.emit('continue', {'gameID' : gameID, 'gameParameters': gameParameters}, function(gameInfo){
+		console.log('Resuming game');
+		console.log(gameInfo);
+		currentGameMode = gameInfo.gameMode;
+		player1UserName = gameInfo.player1;
+		player2UserName = gameInfo.player2;
+		accountHolderTokenType = gameInfo.accountHolderTokenType;
+		callback(gameInfo);
 	});
 }
 
@@ -120,18 +130,58 @@ function delCredentialCookie(){
 // boardSize: size of the board
 // playMode: 0: Local 1: AI
 // token: The token type (black == 1/white == 2)
-function onNewGameButtonClick(boardSize, playMode, tokenType){
+function onNewGameButtonClick(boardSize, playMode, tokenType, callback){
 	var gameParameters = {
 		boardSize : boardSize,
 		playMode : playMode,
 		tokenType : tokenType
 	};
-
+	continueGame(null, gameParameters, function(result){
+		console.log('callback - onNewGameButtonClick');
+		if(callback){
+			console.log('New game created.');
+			updateGameStatus(callback);
+		}
+	});
 }
 
-function updateGameStatus(){
-	socket.emit();
+function updateGameStatus(callback){
+	socket.emit('update', null, function(data){
+		console.log(data);
+		currentBoard = data.board;
+		currentPlayer = data.currentTurn;
+		console.log(currentBoard);
+		if(callback){
+			callback(data);
+		}
+	});
 }
+
+function makeMove(x, y, c, pass, callback) {
+	var moveObj = {x: x, y: y, c: c, pass: pass};
+	socket.emit('makeMove', moveObj, function(result) {
+		console.log('Move result: ' + result);
+		if(result >= 0){
+			updateGameStatus();
+		}else{
+			alert('Invalid move: status code: ' + result);
+		}
+		if(callback){
+			callback(result);
+		}
+	});
+}
+
+socket.on('actionRequired', function(action){
+	switch(action){
+		case 0:
+			updateGameStatus();
+			break;
+		default:
+			console.log('Unsupported action');
+	}
+	console.log('updateRequired signal received');
+});
 
 socket.on('publish', function(data) {
 	console.log('>> ' + data);
@@ -144,9 +194,10 @@ socket.on('connect', function(){
 			getAccountInfo(function(accountInfoObj) {
 				if(accountInfoObj.currentGame){
 					// There's an unfinished game, continue automatically
-					continueGame(accountInfoObj.currentGame, function(result){
+					continueGame(accountInfoObj.currentGame, null, function(gameInfo){
 						// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
 						console.log('Unfinished game detected, automatically resume.');
+						updateGameStatus();
 					});
 				}
 				var player1TokenID = accountInfoObj.tokenId[0];
