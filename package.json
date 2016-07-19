@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "chai": "^3.5.0",
     "istanbul": "^0.4.4"
   }
 }

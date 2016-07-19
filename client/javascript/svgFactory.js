@@ -86,7 +86,8 @@ function makeToken(X, Y, w, src, className, onClick=null){
   token.setAttribute("width", w+"%");
   token.setAttribute("height", w+"%");
   token.setAttribute("class", className);
-  token.onclick = onClick;
+  if (onClick)
+    token.onclick = onClick;
 
   return token;
 
