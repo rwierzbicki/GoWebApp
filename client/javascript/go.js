@@ -93,14 +93,16 @@ function onClickNewToken(event) {
 		PLAYER_1_TOKEN = event.target.id;
 		document.getElementById(PLAYER_1_TOKEN).className = "choose-token-image taken";
 		document.getElementById("p1-token").src = PLAYER_1_TOKEN;
-		swapUnplacedTokens(PLAYER_1_TOKEN);
+		if (playerNewToken === currPlayer)
+			swapUnplacedTokens(PLAYER_1_TOKEN);
 		swapPlacedTokens(1, PLAYER_1_TOKEN);
 	} else {
 		document.getElementById(PLAYER_2_TOKEN).className = "choose-token-image";
 		PLAYER_2_TOKEN = event.target.id;
 		document.getElementById(PLAYER_2_TOKEN).className = "choose-token-image taken";
 		document.getElementById("p2-token").src = PLAYER_2_TOKEN;
-		swapUnplacedTokens(PLAYER_2_TOKEN);
+		if (playerNewToken === currPlayer)
+			swapUnplacedTokens(PLAYER_2_TOKEN);
 		swapPlacedTokens(2, PLAYER_2_TOKEN);
 	}
 
@@ -154,6 +156,9 @@ function makeGameBoard() {
 
 function onClickToken(event) {
 	var token = event.target;
+	if (token.getAttribute("class") !== "token-image unplaced")
+		return;
+
 	token.setAttributeNS(null, "class", "token-image placed " + currPlayer);
 	
 	if (board.hotseat) {
@@ -176,7 +181,6 @@ function swapPlacedTokens(player, newImage) {
 	else
 		var tokens = document.getElementsByClassName('token-image placed 2');
 
-	swapUnplacedTokens(newImage);
 	for (var i = 0; i < tokens.length; i++) {
 		tokens[i].setAttributeNS('http://www.w3.org/1999/xlink','href', newImage);
 	}
