@@ -156,7 +156,7 @@ function updateGameStatus(callback){
 		if(callback){
 			callback(data);
 		}
-		
+
 		console.log("keys = " + Object.keys(data));
 		board.state = data.board;
 		currPlayer = data.currentTurn;
@@ -167,6 +167,8 @@ function updateGameStatus(callback){
 		makeGameBoard();
 		updatePlayerInfo();
 		renderUnfinishedGameBoard();
+
+		isLoading = false;
 	});
 }
 
@@ -174,9 +176,6 @@ function makeMove(x, y, c, pass, callback) {
 	var moveObj = {x: x, y: y, c: c, pass: pass};
 	socket.emit('makeMove', moveObj, function(result) {
 		console.log('Move result: ' + result);
-		if(result < 0){
-			alert('Invalid move: status code: ' + result);
-		}
 		if(callback){
 			callback(result);
 		}

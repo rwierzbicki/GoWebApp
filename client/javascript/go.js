@@ -36,6 +36,8 @@ var board = {
 	}
 }
 
+var isLoading = false;
+
 var currPlayer;
 var playerNewToken; // which player is changing their token
 
@@ -109,12 +111,12 @@ function clickPass(event) {
 	} else if (currPlayer === 2 && event.target.id === "p2-pass-button") {
 		if (player1.passed) {
 			player2.passed = true;
-			alert("This game is finished");	// TODO end game!
+			showAlert("This game is finished");	// TODO end game!
 		} else {
 			currPlayer = 1;
 		}
 	} else {
-		alert("You can only pass on your turn!");
+		showAlert("You can only pass on your turn!");
 	}
 
 	updatePlayerInfo();
@@ -232,23 +234,20 @@ function onClickToken(event) {
 	var token = event.target;
 	if (token.getAttribute("class") !== "token-image unplaced")
 		return;
+	if (isLoading) {
+		showAlert("We're loading", "One moment");
+		return;
+	}
+	isLoading = true;
 
 	console.log("X = " + token.getAttribute("X") + " Y = " + token.getAttribute("Y") + " colour = " + currPlayer);
 
-	makeMove(token.getAttribute("X"), token.getAttribute("Y"), currPlayer, false, function(result) {
-		console.log("result = " + result);
+	makeMove(parseInt(token.getAttribute("X")), parseInt(token.getAttribute("Y")), currPlayer, false, function(result) {
+		if (result < 0) {
+			showAlert("result = " + result);
+			isLoading = false;
+		}
 	});
-
-	/*token.setAttribute("class", "token-image placed " + currPlayer);
-	
-	if (board.hotseat) {
-		currPlayer = (currPlayer === 1 ? 2 : 1);
-	}
-
-	player1.passed = false;
-	updatePlayerInfo();
-	updateUnplacedTokens();*/
-	
 }
 
 function swapPlacedTokens(player, newImage) {

@@ -85,19 +85,19 @@ function submitLogin() {
 	var password = form["password"].value;
 
 	if (username.substring(0, 5) === "temp_") {
-		alert("Please choose a username which does not start with 'temp_'");
+		showAlert("Please choose a username which does not start with 'temp_'");
 		return;
 	}
 
 	auth(username, password, function(saveCredentialToCookie, result) {
 		switch(result) {
 			case -1:
-				alert("You're already logged in!");
+				showAlert("You're already logged in!");
 				break;
 			case 0:
-				alert("We couldn't find that password", "Oops...");
+				showAlert("We couldn't find that password", "Oops...");
 				break;
-			case 3: alert("New account created", "Welcome!");
+			case 3: showAlert("New account created", "Welcome!");
 			case 1:
 			case 4:
 				if (userSigningIn == 1) {
@@ -128,7 +128,7 @@ function logout() {
  * @param text {string} alert message
  * @param header {string} optional, bolded text before message
  */
-function alert(text, header) {
+function showAlert(text, header) {
 	var div = document.createElement("div");
 	div.className = "alert alert-warning alert-dismissible fade in";
 	div.setAttribute("role", "alert");

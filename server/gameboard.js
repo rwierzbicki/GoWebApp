@@ -124,7 +124,7 @@ function suicide(board, x, y, colour) {
     for (var direction = 0; direction < 4; direction++) {
         var neighbourX = x + dx[direction];
         var neighbourY = y + dy[direction];
-        if (inBounds(board, neighbourX, neighbourY) && board[neighbourY][neighbourX] !== oppColour) {
+        if (inBounds(board, neighbourX, neighbourY) && (board[neighbourY][neighbourX] !== oppColour)) {
             return false;
         }
     }
