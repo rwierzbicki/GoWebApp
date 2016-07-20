@@ -7,42 +7,14 @@ var replay = false;
 
 
 function loadGameHistory() {
-	// TODO: get game history data from server
-	var data = [
-		{
-			gameId: 1,
-			date: 437298759875,
-			player1: "mystigan",
-			player2: "tigger342",
-			finished: false
-		},
-		{
-			gameId: 2,
-			date: 437298759875,
-			player1: "tigger342",
-			player2: "mystigan",
-			finished: false
-		},
-		{
-			gameId: 3,
-			date: 51235750293,
-			player1: "mystigan",
-			player2: null,
-			finished: true,
-			winner: 1
-		}
-	];
-
-	callback(data);
-
-	function callback(data) {
+	getGameHistory(function callback(data) {
 		var table = document.getElementById('game-history-table');
 		for (var i = 0; i < data.length; i++) {
 			var row = table.insertRow(-1);	// insert row at end
 
 			// Date
 			var cell = row.insertCell();
-			cell.innerHTML = (new Date(data[i].date)).toDateString();
+			cell.innerHTML = (data[i].date);
 
 			// Player 1
 			cell = row.insertCell();
@@ -50,15 +22,17 @@ function loadGameHistory() {
 
 			// Player 2
 			cell = row.insertCell();
-			if (data[i].player2)
+			if (data[i].gameMode === 0)
 				cell.innerHTML = data[i].player2;
 			else
 				cell.innerHTML = "CPU";
 
+			// show winner by comparing data[i].score1 and data[i].score2
+
 			// Replay or continue
 			cell = row.insertCell();
 			var button = document.createElement('button');
-			button.setAttribute('gameId', data[i].gameId);
+			button.setAttribute('gameId', data[i].history_id);
 			button.className = "btn btn-primary";
 			if (data[i].finished) {
 				button.innerHTML = "Replay";
@@ -69,7 +43,7 @@ function loadGameHistory() {
 			}
 			cell.appendChild(button);
 		}
-	}	
+	});	
 }
 
 function clickContinueGame(event) {

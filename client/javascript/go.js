@@ -105,22 +105,17 @@ function clickPass(event) {
 	if (replay)
 		return;
 
-	if (currPlayer === 1 && event.target.id === "p1-pass-button") {	// if player 1 passed
-		player1.passed = true;
-		currPlayer = 2;
-	} else if (currPlayer === 2 && event.target.id === "p2-pass-button") {
-		if (player1.passed) {
-			player2.passed = true;
-			showAlert("This game is finished");	// TODO end game!
-		} else {
-			currPlayer = 1;
-		}
-	} else {
+	if ((event.target.id === "p1-pass-button" && currPlayer !== 1) || (event.target.id === "p2-pass-button" && currPlayer !== 2)) {
 		showAlert("You can only pass on your turn!");
+		return;
 	}
 
-	updatePlayerInfo();
-	updateUnplacedTokens();
+	makeMove(0, 0, currPlayer, true, function(result) {
+		if (result < 0) {
+			showAlert("result = " + result);
+			isLoading = false;
+		}
+	});
 }
 
 // load tokens into Token Selection Modal

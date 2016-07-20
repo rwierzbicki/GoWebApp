@@ -17,7 +17,6 @@ window.onload = function() {
 	$('#p1-pass-button').click(clickPass);
 	$('#p2-pass-button').click(clickPass);
 
-	loadGameHistory();
 	loadTokenSelectionModal();
 }
 
@@ -114,6 +113,7 @@ function login() {
 	$('#login-button').parent().parent().hide();
 	$('#username-button').html(player1.username + '<b class="caret"></b>');
 	$('#username-button').parent().parent().show();
+	loadGameHistory();
 	updatePlayerInfo();
 	loadTokenSelectionModal();
 }
