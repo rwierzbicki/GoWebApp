@@ -123,7 +123,8 @@ function clickPass(event) {
 
 // load tokens into Token Selection Modal
 function loadTokenSelectionModal() {
-	var modalBody = document.getElementById('chooseTokenBody');
+	var modalBody = document.getElementById('choose-token-body');
+	modalBody.innerHTML = "";
 	for (var key in TOKEN_IMGS) {
 		var a = document.createElement('a');
 		var img = document.createElement('img');

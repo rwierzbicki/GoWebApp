@@ -11,11 +11,13 @@ window.onload = function() {
 	});
 	$('#game-history-button').click(showHistoryPage);
 	$('#logout-button').click(logout);
-	$('#chooseTokenModal').on('show.bs.modal', onTokenModalOpened);
+	$('#choose-token-modal').on('show.bs.modal', onTokenModalOpened);
 	$('#prev-board-button').click(clickPrevBoard);
 	$('#next-board-button').click(clickNextBoard);
 	$('#p1-pass-button').click(clickPass);
 	$('#p2-pass-button').click(clickPass);
+
+	$('#username-button').parent().hide();	// not sure why giving it the class 'initially-hidden' does not work...
 
 	loadTokenSelectionModal();
 	loadGameHistory();
@@ -82,22 +84,31 @@ function submitLogin() {
 		return;
 	}
 
-	if (userSigningIn == 1) {
-		player1.username = form["username"].value;
-		var password = form["password"].value;
-		// TODO authenticate user
-		login();
-	} else {
-		player2.username = form["username"].value;
-		var password = form["password"].value;
-		// TODO authenticate user
-	}
+	auth(username, password, function(saveCredentialToCookie, result) {
+		switch(result) {
+			case -1:
+				alert("You're already logged in!");
+				break;
+			case 0:
+				alert("Check your password", "Oops...");
+				break;
+			case 1:
+			case 3:
+			case 4:
+				if (userSigningIn == 1) {
+					player1.username = username;
+				} else {
+					player2.username = username;
+				}
+				initialize(username, password, true);
+		}
+	});
 }
 
 function login() {
-	$('#login-button').parent().parent().hide();
+	$('#login-button').parent().hide();
 	$('#username-button').html(player1.username + '<b class="caret"></b>');
-	$('#username-button').parent().parent().show();
+	$('#username-button').parent().show();
 	updatePlayerInfo();
 }
 

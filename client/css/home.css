@@ -2,12 +2,6 @@
 	display: none;
 }
 
-/* Right align navbar options excluding logo */
-.nav.pull-right {
-  float: right;
-  margin-right: 98px;
-}
-
 .curr-player{
   background-color: LightCyan;
 }
