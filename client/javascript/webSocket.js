@@ -178,6 +178,10 @@ function changeTokenImgs(tokenIds) {
 	})
 }
 
+function sendMessage(message){
+	socket.emit('publish', message);
+}
+
 socket.on('actionRequired', function(action){
 	switch(action){
 		case 0:
