@@ -316,7 +316,7 @@ class DBInterface{
 	}
 
 	// Initialize the database with basic documents and collections
-	init(){
+	init(callback){
 		// Put initializations here if there are any
 		this.authenticateUser('anonymous', 'lfcd61tavjvrzwnx', function(userAccountObjectID, statusCode){
 			anonymousUserObjectID = userAccountObjectID;
@@ -325,6 +325,7 @@ class DBInterface{
 			}else{
 				console.log('Database structure verified');
 			}
+			callback();
 		});
 	}
 
