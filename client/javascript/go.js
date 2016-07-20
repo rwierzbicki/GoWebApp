@@ -125,11 +125,12 @@ function clickPass(event) {
 function loadTokenSelectionModal() {
 	var modalBody = document.getElementById('chooseTokenBody');
 	modalBody.innerHTML = "";
+
 	for (var key in TOKEN_IMGS) {
 		var a = document.createElement('a');
 		var img = document.createElement('img');
 		img.src = TOKEN_IMGS[key];
-		img.id = key;
+		img.setAttribute("token", key);
 		a.onclick = onClickNewToken;
 
 		// token is already being used
@@ -155,18 +156,12 @@ function onClickNewToken(event) {
 	}
 
 	if (playerNewToken === 1) {
-		document.getElementById(player1.token).className = "choose-token-image";
-		player1.token = event.target.id;
-		document.getElementById(player1.token).className = "choose-token-image taken";
-		document.getElementById("p1-token").src = TOKEN_IMGS[player1.token];
+		player1.token = event.target.getAttribute("token");
 		if (playerNewToken === currPlayer)
 			updateUnplacedTokens();
 		swapPlacedTokens(1, TOKEN_IMGS[player1.token]);
 	} else {
-		document.getElementById(player2.token).className = "choose-token-image";
-		player2.token = event.target.id;
-		document.getElementById(player2.token).className = "choose-token-image taken";
-		document.getElementById("p2-token").src = TOKEN_IMGS[player2.token];
+		player2.token = event.target.getAttribute("token");
 		if (playerNewToken === currPlayer)
 			updateUnplacedTokens();
 		swapPlacedTokens(2, TOKEN_IMGS[player2.token]);
@@ -174,6 +169,8 @@ function onClickNewToken(event) {
 
 	$('#chooseTokenModal').modal('hide');
 
+	updatePlayerInfo();
+	loadTokenSelectionModal();
 	changeTokenImgs([player1.token, player2.token]);
 }
 
