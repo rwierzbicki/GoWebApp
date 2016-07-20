@@ -118,12 +118,10 @@ function clickContinueGame(event) {
 
 		if (primary === 1 && data.player2 === player1.username) {
 			primary = 2;
-			player2.token = player1.token;
-			player1.token = getOtherToken(player2.token);
+			swapPlayerTokens();
 		} else if (primary === 2 && data.player1 === player2.username) {
 			primary = 1;
-			player1.token = player2.token;
-			player2.token = getOtherToken(player2.token);
+			swapPlayerTokens();
 		}
 
 		player1.username = data.player1;
@@ -145,7 +143,7 @@ function clickReplayGame(event) {
 	// TODO get game data from server using gameId
 	var data = {
 		player1: "mystigan",
-		player2: "tigger342",
+		player2: "wileycoyote",
 		boardSize: 9,
 		history: [
 			{
@@ -200,15 +198,13 @@ function clickReplayGame(event) {
 			$('#prev-board-button').show();
 
 		if (primary === 1 && data.player2 === player1.username) {
-			player2.token = player1.token;
-			player1.token = getOtherToken(player2.token);
+			swapPlayerTokens();
 		} else if (primary === 2 && data.player1 === player2.username) {
-			player1.token = player2.token;
-			player2.token = getOtherToken(player2.token);
+			swapPlayerTokens();
 		}
 
 		player1.username = data.player1;
-		player2.username = data.player2;
+		player2.username = data.player2;	console.log(player2.username);
 
 		renderHistoryGameBoard();
 		updateHistoryInfo();

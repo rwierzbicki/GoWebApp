@@ -8,6 +8,7 @@ var player2Passed = false;
 var accountHolderTokenType = null;
 var player1UserName = null;
 var player2UserName = null;
+var primaryAccountUserName = null;
 
 // Authentication function
 function auth(username, password, callback){
@@ -48,6 +49,7 @@ function auth(username, password, callback){
 		if(saveCredentialToCookie){
 			setCookie('username', username, 365);
 			setCookie('password', password, 365);
+			primaryAccountUserName = username;
 			callback(true, result);
 		}else{
 			callback(false, result);
@@ -203,7 +205,34 @@ socket.on('publish', function(data) {
 socket.on('connect', function(){
 	var credential = getCredentialCookie();
 	auth(credential.username, credential.password, function(isSucceed, statusNo){
-
+		initialize(credential.username, credential.password, isSucceed);
 	});
 });
 
+function initialize(username, password, isSucceed) {
+	if(isSucceed){
+		getAccountInfo(function(accountInfoObj) {
+			if(accountInfoObj.currentGame){
+				// There's an unfinished game, continue automatically
+				continueGame(accountInfoObj.currentGame, null, function(gameInfo){
+					// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
+					console.log('Unfinished game detected, automatically resume.');
+					updateGameStatus();
+				});
+			}
+			var player1TokenID = accountInfoObj.tokenId[0];
+			var player2TokenID = accountInfoObj.tokenId[1];
+			// Set token images here;
+			console.log('Set token images to: P1: ' + player1TokenID + ', P2: ' + player2TokenID);
+
+			player1.token = player1TokenID;
+			player2.token = player2TokenID;
+
+			if (username.substring(0,5) !== "temp_") {
+				player1.username = username;
+				login();
+			}
+
+		});
+	}
+}

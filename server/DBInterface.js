@@ -3,7 +3,7 @@
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
-var defaultToken = ['raccon', 'fox'];
+var defaultToken = ['raccoon', 'fox'];
 var anonymousUserObjectID = null;
 var anonymousUserPassword = 'lfcd61tavjvrzwnx';
 
