@@ -52,7 +52,7 @@ db.connect(function(error){
 io.sockets.on('connection', function(socket){
 	console.log("Connection accepted: %s", socket.id);
 	// conenctionList.push({id : socket.id, socket : socket});
-	conenctionList[socket.id] = socket;
+	conenctionList[socket.id] = {userName : null, socket : socket};
 	var isLoggedIn = false;
 	var userObjID = null;
 	var username = null;
@@ -116,14 +116,15 @@ io.sockets.on('connection', function(socket){
 						gameObject.player2 = player2UserObj.username;
 						gameObject.accountHolderTokenType = accountHolderTokenType;
 						callback(gameObject);
-						aiSubroutine();
+						externalNodeSubroutine();
 					});
 				});
 			}
 		});
 	}
 
-	var aiSubroutine = function(){
+	var externalNodeSubroutine = function(){
+		// If the game is in AI mode, and this is the AI's turn, call the AI interface and get a random move.
 		if(gameMode == 1 && (currentTurn != accountHolderTokenType)){
 			// Need to fetch data from the AI server
 			console.log('getting random move');
@@ -134,6 +135,11 @@ io.sockets.on('connection', function(socket){
 						console.log('notification sent');
 					});
 				});
+			});
+		}else{
+			// else, simply notify the client for update
+			socket.emit('actionRequired', 0, function(){
+				console.log('notification sent');
 			});
 		}
 	}
@@ -291,7 +297,7 @@ io.sockets.on('connection', function(socket){
 		makeMove(moveObj, function(result){
 			response(result);
 			if(result >= 0){
-				aiSubroutine();
+				externalNodeSubroutine();
 			}
 		});
 	});
@@ -304,7 +310,7 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('getGameHistory', function(data, response){
-		db.getGameHistory(function(gameHistoryList){
+		db.getGameHistory(userObjID, function(gameHistoryList){
 			response(gameHistoryList);
 		});
 	});

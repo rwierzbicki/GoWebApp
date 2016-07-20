@@ -161,9 +161,7 @@ function makeMove(x, y, c, pass, callback) {
 	var moveObj = {x: x, y: y, c: c, pass: pass};
 	socket.emit('makeMove', moveObj, function(result) {
 		console.log('Move result: ' + result);
-		if(result >= 0){
-			updateGameStatus();
-		}else{
+		if(result < 0){
 			alert('Invalid move: status code: ' + result);
 		}
 		if(callback){
@@ -176,6 +174,15 @@ function changeTokenImgs(tokenIds) {
 	socket.emit('changePrimaryTokenImage', tokenIds, function(isOk){
 		console.log(isOk);
 	})
+}
+
+function getGameHistory(callback){
+	socket.emit('getGameHistory', null, function(gameHistoryList){
+		console.log(gameHistoryList);
+		if(callback){
+			callback(gameHistoryList);
+		}
+	});
 }
 
 socket.on('actionRequired', function(action){
@@ -196,22 +203,7 @@ socket.on('publish', function(data) {
 socket.on('connect', function(){
 	var credential = getCredentialCookie();
 	auth(credential.username, credential.password, function(isSucceed, statusNo){
-		if(isSucceed){
-			getAccountInfo(function(accountInfoObj) {
-				if(accountInfoObj.currentGame){
-					// There's an unfinished game, continue automatically
-					continueGame(accountInfoObj.currentGame, null, function(gameInfo){
-						// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
-						console.log('Unfinished game detected, automatically resume.');
-						updateGameStatus();
-					});
-				}
-				var player1TokenID = accountInfoObj.tokenId[0];
-				var player2TokenID = accountInfoObj.tokenId[1];
-				// Set token images here;
-				console.log('Set token images to: P1: ' + player1TokenID + ', P2: ' + player2TokenID);
-			});
-		}
+
 	});
 });
 
