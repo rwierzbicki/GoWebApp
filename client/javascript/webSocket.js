@@ -156,6 +156,17 @@ function updateGameStatus(callback){
 		if(callback){
 			callback(data);
 		}
+		
+		console.log("keys = " + Object.keys(data));
+		board.state = data.board;
+		currPlayer = data.currentTurn;
+		player1.passed = data.player1Passed;
+		player1.capturedTokens = data.player1CapturedTokens;
+		player2.passed = data.player2Passed;
+		player2.capturedTokens = data.player2CapturedTokens;
+		makeGameBoard();
+		updatePlayerInfo();
+		renderUnfinishedGameBoard();
 	});
 }
 
@@ -238,7 +249,9 @@ function initialize(username, password, isSucceed) {
 				continueGame(accountInfoObj.currentGame, null, function(gameInfo){
 					// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
 					console.log('Unfinished game detected, automatically resume.');
-					// updateGameStatus();
+					board.setSize(gameInfo.boardSize);
+					board.hotseat = (gameInfo.gameMode === 0);
+					showGamePage();
 				});
 			}
 			var player1TokenID = accountInfoObj.tokenId[0];

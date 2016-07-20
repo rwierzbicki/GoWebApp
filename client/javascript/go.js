@@ -28,7 +28,7 @@ player2 = {
 var board = {
 	size: 0,
 	sqSize: 0,		// in percent
-	hotseat: true,	// TODO: get from game options
+	hotseat: true,	// false is assumed to be vs AI
 	state: [],		// board as 2D array
 	setSize: function(sizeValue){
 		this.size = sizeValue;
@@ -233,7 +233,13 @@ function onClickToken(event) {
 	if (token.getAttribute("class") !== "token-image unplaced")
 		return;
 
-	token.setAttribute("class", "token-image placed " + currPlayer);
+	console.log("X = " + token.getAttribute("X") + " Y = " + token.getAttribute("Y") + " colour = " + currPlayer);
+
+	makeMove(token.getAttribute("X"), token.getAttribute("Y"), currPlayer, false, function(result) {
+		console.log("result = " + result);
+	});
+
+	/*token.setAttribute("class", "token-image placed " + currPlayer);
 	
 	if (board.hotseat) {
 		currPlayer = (currPlayer === 1 ? 2 : 1);
@@ -241,7 +247,7 @@ function onClickToken(event) {
 
 	player1.passed = false;
 	updatePlayerInfo();
-	updateUnplacedTokens();
+	updateUnplacedTokens();*/
 	
 }
 

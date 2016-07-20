@@ -60,16 +60,23 @@ function pageSwitched() {
 
 function startGame() {
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
+	board.hotseat = $('input[name="play-mode-radio"]:checked').val() === "hotseat";
 	currPlayer = 1;
 
 	if (primary === 2) {
 		primary = 1
 		swapPlayerTokens();
-	}  
+	} 
 
-	renderNewGameBoard();
-	updatePlayerInfo();
-	showGamePage();
+	onNewGameButtonClick(board.size, (board.hotseat ? 0 : 1), 1, function(data) {
+		board.state = data.board;
+		currPlayer = data.currentTurn;
+		console.log("board.state = " + board.state);
+		console.log("currPlayer = " + currPlayer);
+		updatePlayerInfo();
+		renderUnfinishedGameBoard();
+		showGamePage();
+	});
 }
 
 function submitLogin() {
