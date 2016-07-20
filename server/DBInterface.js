@@ -177,7 +177,7 @@ class DBInterface{
 								gameObject.player1 = player1UserObj.username;
 								_this.getAccountInfo(gameObject.player2, function(player2UserObj){
 									gameObject.player2 = player2UserObj.username;
-									if(thisI == (gameObjects.length - 1)){
+									if(thisI == (0)){
 										callback(gameObjects); 
 										// console.log('reached 1');
 									}
