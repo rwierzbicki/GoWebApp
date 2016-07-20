@@ -90,8 +90,8 @@ function submitLogin() {
 			case 0:
 				alert("We couldn't find that password", "Oops...");
 				break;
+			case 3: alert("New account created", "Welcome!");
 			case 1:
-			case 3:
 			case 4:
 				if (userSigningIn == 1) {
 					player1.username = username;
@@ -141,7 +141,7 @@ function alert(text, header) {
 
 	if (header) {
 		var heading = document.createElement("strong");
-		heading.innerHTML = header;
+		heading.innerHTML = header + " ";
 
 		div.appendChild(heading);
 	}
