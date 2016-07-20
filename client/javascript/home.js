@@ -17,8 +17,8 @@ window.onload = function() {
 	$('#p1-pass-button').click(clickPass);
 	$('#p2-pass-button').click(clickPass);
 
-	loadTokenSelectionModal();
 	loadGameHistory();
+	loadTokenSelectionModal();
 }
 
 function showHomePage() {
@@ -63,10 +63,8 @@ function startGame() {
 	currPlayer = 1;
 
 	if (primary === 2) {
-		var temp = player1;
-		player1 = player2;
-		player2 = temp
 		primary = 1
+		swapPlayerTokens();
 	}  
 
 	renderNewGameBoard();
@@ -76,22 +74,33 @@ function startGame() {
 
 function submitLogin() {
 	var form = document.getElementById("login-form").elements;
-	
-	if (form["username"].value.substring(0, 5) === "_temp") {
-		alert("Please choose a username which does not start with '_temp'");
+	var username = form["username"].value;
+	var password = form["password"].value;
+
+	if (username.substring(0, 5) === "temp_") {
+		alert("Please choose a username which does not start with 'temp_'");
 		return;
 	}
 
-	if (userSigningIn == 1) {
-		player1.username = form["username"].value;
-		var password = form["password"].value;
-		// TODO authenticate user
-		login();
-	} else {
-		player2.username = form["username"].value;
-		var password = form["password"].value;
-		// TODO authenticate user
-	}
+	auth(username, password, function(saveCredentialToCookie, result) {
+		switch(result) {
+			case -1:
+				alert("You're already logged in!");
+				break;
+			case 0:
+				alert("We couldn't find that password", "Oops...");
+				break;
+			case 1:
+			case 3:
+			case 4:
+				if (userSigningIn == 1) {
+					player1.username = username;
+				} else {
+					player2.username = username;
+				}
+				initialize(username, password, true);
+		}
+	});
 }
 
 function login() {
@@ -99,13 +108,12 @@ function login() {
 	$('#username-button').html(player1.username + '<b class="caret"></b>');
 	$('#username-button').parent().parent().show();
 	updatePlayerInfo();
+	loadTokenSelectionModal();
 }
 
 function logout() {
-	player1.username = undefined;
-	$('#username-button').parent().parent().hide();
-	$('#login-button').parent().parent().show();
-	showHomePage();
+	delCredentialCookie();
+	location.reload();
 }
 
 /**

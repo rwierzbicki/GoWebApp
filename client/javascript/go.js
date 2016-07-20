@@ -124,6 +124,7 @@ function clickPass(event) {
 // load tokens into Token Selection Modal
 function loadTokenSelectionModal() {
 	var modalBody = document.getElementById('chooseTokenBody');
+	modalBody.innerHTML = "";
 	for (var key in TOKEN_IMGS) {
 		var a = document.createElement('a');
 		var img = document.createElement('img');
@@ -172,6 +173,8 @@ function onClickNewToken(event) {
 	}
 
 	$('#chooseTokenModal').modal('hide');
+
+	changeTokenImgs([player1.token, player2.token]);
 }
 
 function renderNewGameBoard() {
@@ -287,13 +290,19 @@ function boardListToArray(size, boardList) {
 	return boardArr;
 }
 
+function swapPlayerTokens() {
+	var temp = player1.token;
+	player1.token = player2.token;
+	player2.token = temp;
+}
+
 /**
  * Returns a token image which is not already taken
  * (more specifically, the next available token)
  *
  * @param token {key in TOKEN_IMGS} token which is already taken
  */
-function getOtherToken(token) {
+/*function getOtherToken(token) {
 	keys = Object.keys(TOKEN_IMGS);
 	return keys[(keys.indexOf(token)+1)%keys.length];
-}
+}*/
