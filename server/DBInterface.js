@@ -153,6 +153,42 @@ class DBInterface{
 		});
 	}
 
+	getGameHistory(userAccountObjectID, callback){
+		var _this = this;
+		this.connect(function(){
+			var collection = _this._db.collection('users');
+			collection.findOne({_id : userAccountObjectID}, function(findUserErr, user){
+				if(!user){
+					callback(null);
+				}else{
+					var gameHistory = user.gameHistory;
+					var gameCollection = _this._db.collection('gamecollection');
+
+					gameCollection.find({_id : {$in : gameHistory}}).toArray(function(findGameErr, gameObjects){
+						for (var i = 0; i < gameObjectIDs.length; i++) {
+							var gameObject  = gameObjects[i];
+							delete gameObject['moveHistory'];
+							this.getAccountInfo(gameObject.player1, function(player1UserObj){
+								gameObject.player1 = player1UserObj.username;
+								this.getAccountInfo(gameObject.player2, function(player2UserObj){
+									gameObject.player2 = player2UserObj.username;
+									if(i == gameObjectIDs.length - 1){
+										callback(gameObjects);
+									}
+								});
+							});
+						}
+
+					});
+					if(gameHistory.length == 0){
+						callback([]);
+					}
+				}
+
+			});
+		});
+	}
+
 	getAccountInfo(userAccountObjectID, callback){
 		var _this = this;
 		this.connect(function(){

@@ -172,6 +172,12 @@ function makeMove(x, y, c, pass, callback) {
 	});
 }
 
+function changeTokenImgs(tokenIds) {
+	socket.emit('changePrimaryTokenImage', tokenIds, function(isOk){
+		console.log(isOk);
+	})
+}
+
 socket.on('actionRequired', function(action){
 	switch(action){
 		case 0:

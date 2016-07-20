@@ -2,19 +2,24 @@ var http = require("http");
 
 function getRandomMove(size, board, lastMove, cb){
 
-    // TODO: Implement me...
+	// TODO: Implement me...
+	var tempLastMove = {
+		x : lastMove.pass? 0: lastMove.y,
+		y : lastMove.pass? 0: lastMove.x,
+		c : lastMove.pass? 0: lastMove.c,
+		pass : lastMove.pass
+	};
 
 	var postData = {
 		'size' : size,
 		'board' : board,
-		'last' : lastMove
+		'last' : tempLastMove
 	};
 
 	postData = JSON.stringify(postData);
 
-    // See https://nodejs.org/api/http.html#http_http_request_options_callback
+	// See https://nodejs.org/api/http.html#http_http_request_options_callback
 	var options = {
-		// host : 'roberts.seng.uvic.ca',
 		host : '127.0.0.1',
 		path : '/ai/random',
 		port : '30000',
@@ -40,6 +45,8 @@ function getRandomMove(size, board, lastMove, cb){
 		});
 	};
 
+
+
 	var req = http.request(options, callback);
 
 	req.on('error', function (e) {
@@ -52,5 +59,5 @@ function getRandomMove(size, board, lastMove, cb){
 }
 
 module.exports = {
-    getRandomMove : getRandomMove
+	getRandomMove : getRandomMove
 }

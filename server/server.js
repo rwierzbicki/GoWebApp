@@ -105,9 +105,7 @@ io.sockets.on('connection', function(socket){
 					gameLogicModule.boardListToArray(previousGameBoard.board, prevBoard);
 				}
 			}
-			if(gameMode == 1 && (currentTurn != accountHolderTokenType)){
-
-			}
+			
 			if(callback){
 				// delete the move history to reduce network traffic
 				delete gameObject['moveHistory'];
@@ -118,10 +116,26 @@ io.sockets.on('connection', function(socket){
 						gameObject.player2 = player2UserObj.username;
 						gameObject.accountHolderTokenType = accountHolderTokenType;
 						callback(gameObject);
+						aiSubroutine();
 					});
 				});
 			}
 		});
+	}
+
+	var aiSubroutine = function(){
+		if(gameMode == 1 && (currentTurn != accountHolderTokenType)){
+			// Need to fetch data from the AI server
+			console.log('getting random move');
+			aiInterface.getRandomMove(currBoard.length, currBoard, lastMove, function(move){
+				makeMove(move, function(result){
+					assert.equal(result >= 0, true);
+					socket.emit('actionRequired', 0, function(){
+						console.log('notification sent');
+					});
+				});
+			});
+		}
 	}
 
 	socket.on('auth', function(data, response){
@@ -275,16 +289,23 @@ io.sockets.on('connection', function(socket){
 		console.log('====');
 
 		makeMove(moveObj, function(result){
-			if(gameMode == 1 && (currentTurn != accountHolderTokenType)){
-				// Need to fetch data from the AI server
-				aiInterface.getRandomMove(function(move){
-					makeMove(move, function(result){
-						assert.equal(result >= 0, true);
-						socket.emit('');
-					});
-				});
-			}
 			response(result);
+			if(result >= 0){
+				aiSubroutine();
+			}
+		});
+	});
+
+	socket.on('changePrimaryTokenImage', function(tokenImg, response){
+		db.modifyAccountInformation(userObjID, {tokenId : tokenImg}, function (err, result) {
+			assert.equal(err, null);
+			response(true);
+		});
+	});
+
+	socket.on('getGameHistory', function(data, response){
+		db.getGameHistory(function(gameHistoryList){
+			response(gameHistoryList);
 		});
 	});
 
