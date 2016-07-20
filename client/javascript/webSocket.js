@@ -187,10 +187,31 @@ function getGameHistory(callback){
 	});
 }
 
+function sendMessage(msg) {
+	socket.emit('publish', msg);
+}
+
+// Get all the information of a specific game, including move history (for playback)
+function getGameDetail(gameObjectID, callback){
+	socket.emit('getGameDetail', gameObjectID, function(result){
+		console.log(result);
+		if(callback){
+			callback(result);
+		}
+	});
+}
+
 socket.on('actionRequired', function(action){
 	switch(action){
 		case 0:
 			updateGameStatus();
+			break;
+		case 1:
+			// When the client received the logout request from the server
+			// Close the socket connection and display a warning message
+			// The connection will not be reestablished until the user refresh the page
+			socket.close();
+			alert('Account logged in elsewhere. Please refresh the page to reconnect.', 'Warning');
 			break;
 		default:
 			console.log('Unsupported action');
@@ -217,7 +238,7 @@ function initialize(username, password, isSucceed) {
 				continueGame(accountInfoObj.currentGame, null, function(gameInfo){
 					// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
 					console.log('Unfinished game detected, automatically resume.');
-					updateGameStatus();
+					// updateGameStatus();
 				});
 			}
 			var player1TokenID = accountInfoObj.tokenId[0];
