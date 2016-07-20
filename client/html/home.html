@@ -48,6 +48,8 @@
 		  	</nav>
 	  	</div>
 
+	  	<div id="alert" class="container initially-hidden"></div>
+
 	  	<!--============================== LOGIN MODAL ================================-->
 
 	  	<div id="loginModal" class="modal fade" role="dialog">
@@ -134,11 +136,13 @@
 	            			<h4 id="p1-name"></h4>
 	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p1-token" class="player-token"/></a>
 	            			<br>Captured Tokens: <span id="p1-captured-tokens"></span>
+	            			<button id="p1-pass-button" class="btn btn-default">Pass</button>
 	            		</td></tr>
 	            		<tr id="player-2"><td>
 	            			<h4 id="p2-name"></h4>
 	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p2-token" class="player-token"/></a>
 	            			<br>Captured Tokens: <span id="p2-captured-tokens"></span></h4>
+	            			<button id="p2-pass-button" class="btn btn-default">Pass</button>
 	            		</td></tr>
 	            		<tr><td id="history-controls">
 	            			<button id="prev-board-button" class="btn btn-default initially-hidden">Previous</button>
