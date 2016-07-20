@@ -30,7 +30,7 @@ app.listen(30094, function() {
 });
 
 /* =========================================== */
-var conenctionList = {};
+var connectionList = {};
 var gameLogicModule = require('./gameboard.js');
 var dbInterface = require('./DBInterface.js');
 var aiInterface = require('./aiInterface.js');
@@ -51,8 +51,8 @@ db.connect(function(error){
 
 io.sockets.on('connection', function(socket){
 	console.log("Connection accepted: %s", socket.id);
-	// conenctionList.push({id : socket.id, socket : socket});
-	conenctionList[socket.id] = socket;
+	// connectionList.push({id : socket.id, socket : socket});
+	connectionList[socket.id] = {username : null, socket : socket};
 	var isLoggedIn = false;
 	var userObjID = null;
 	var username = null;
@@ -70,6 +70,18 @@ io.sockets.on('connection', function(socket){
 	var currentTurn = null;
 	var player1CapturedTokens = 0;
 	var player2CapturedTokens = 0;
+
+	var fetchUsernameForGameObject = function(gameObject, callback){
+		// Fetch the players' usernames and put them into gameObject before sending back to client
+		db.getAccountInfo(gameObject.player1, function(player1UserObj){
+			gameObject.player1 = player1UserObj.username;
+			db.getAccountInfo(gameObject.player2, function(player2UserObj){
+				gameObject.player2 = player2UserObj.username;
+				gameObject.accountHolderTokenType = accountHolderTokenType;
+				callback(gameObject);
+			});
+		});
+	};
 
 	var resumeData = function(gameObjectID, initRequired, callback){
 		db.getGameObject(gameObjectID, function(gameObject){
@@ -109,21 +121,16 @@ io.sockets.on('connection', function(socket){
 			if(callback){
 				// delete the move history to reduce network traffic
 				delete gameObject['moveHistory'];
-				// Fetch the players' usernames and put them into gameObject before sending back to client
-				db.getAccountInfo(gameObject.player1, function(player1UserObj){
-					gameObject.player1 = player1UserObj.username;
-					db.getAccountInfo(gameObject.player2, function(player2UserObj){
-						gameObject.player2 = player2UserObj.username;
-						gameObject.accountHolderTokenType = accountHolderTokenType;
-						callback(gameObject);
-						aiSubroutine();
-					});
+				fetchUsernameForGameObject(gameObject, function(gameObject){
+					callback(gameObject);
+					externalNodeSubroutine();
 				});
 			}
 		});
-	}
+	};
 
-	var aiSubroutine = function(){
+	var externalNodeSubroutine = function(){
+		// If the game is in AI mode, and this is the AI's turn, call the AI interface and get a random move.
 		if(gameMode == 1 && (currentTurn != accountHolderTokenType)){
 			// Need to fetch data from the AI server
 			console.log('getting random move');
@@ -131,22 +138,53 @@ io.sockets.on('connection', function(socket){
 				makeMove(move, function(result){
 					assert.equal(result >= 0, true);
 					socket.emit('actionRequired', 0, function(){
-						console.log('notification sent');
+						console.log('update notification sent');
 					});
 				});
 			});
+		}else{
+			// else, simply notify the client for update
+			socket.emit('actionRequired', 0, function(){
+				console.log('update notification sent');
+			});
 		}
-	}
+	};
+
+	var terminateDuplicatedSession = function(_username){
+		// If the same account is already logged in elsewhere, send a logout signal to that client
+		console.log('===Scanning duplicate session');
+		for (var socketID in connectionList) {
+			if(connectionList[socketID].username == _username){
+				console.log('Duplicate session detected');
+				connectionList[socketID].socket.emit('actionRequired', 1, function(){
+					console.log('logout request sent');
+				});
+			}
+		}
+		console.log('===Scan complete');
+	};
+
+	socket.on('getGameDetail', function(data, response){
+		var gameObjectID = ObjectID(data);
+		db.getGameObject(gameObjectID, function(gameObject){
+			fetchUsernameForGameObject(gameObject, function(modifiedGameObject) {
+				response(modifiedGameObject);
+			});
+		});
+	});
 
 	socket.on('auth', function(data, response){
 		var credential = JSON.parse(data);
 		console.log('Authenticating: ' + credential.username + ' Password: ' + credential.password);
+
 		if(!isLoggedIn){
 			db.authenticateUser(credential.username, credential.password, function(objID, result){
 				if(result > 0){
 					isLoggedIn = true;
 					userObjID = objID;
 					username = credential.username;
+					terminateDuplicatedSession(username);
+					connectionList[socket.id].username = username;
 				}
 				response(result); // 0: Password incorrect 1: Login succeed 2: Account created
 			});
@@ -161,6 +199,8 @@ io.sockets.on('connection', function(socket){
 						db.modifyAccountInformation(userObjID, {username : credential.username, password : credential.password}, function (err, result) {
 							assert.equal(err, null);
 							username = credential.username;
+							terminateDuplicatedSession(username);
+							connectionList[socket.id].username = username;
 							response(3); // 3: Account upgraded
 						});
 					}else{
@@ -169,6 +209,8 @@ io.sockets.on('connection', function(socket){
 							db.mergeAccount(userObjID, objID, function(isAccountMerged) {
 								userObjID = objID;
 								username = credential.username;
+								terminateDuplicatedSession(username);
+								connectionList[socket.id].username = username;
 								if(isAccountMerged){
 									response(4); // Temporary account merged to formal account
 								}else{
@@ -282,7 +324,7 @@ io.sockets.on('connection', function(socket){
 		}else{
 			callback(-4);
 		}
-	}
+	};
 
 	socket.on('makeMove', function(moveObj, response){
 		console.log('Handling move: ' + JSON.stringify(moveObj));
@@ -291,7 +333,7 @@ io.sockets.on('connection', function(socket){
 		makeMove(moveObj, function(result){
 			response(result);
 			if(result >= 0){
-				aiSubroutine();
+				externalNodeSubroutine();
 			}
 		});
 	});
@@ -304,7 +346,7 @@ io.sockets.on('connection', function(socket){
 	});
 
 	socket.on('getGameHistory', function(data, response){
-		db.getGameHistory(function(gameHistoryList){
+		db.getGameHistory(userObjID, function(gameHistoryList){
 			response(gameHistoryList);
 		});
 	});
@@ -350,9 +392,9 @@ io.sockets.on('connection', function(socket){
 
 	socket.on('publish', function (data) {
 		console.log("ID: %s; Sent: %s", socket.id, data);
-		// for (var socketID in conenctionList){
+		// for (var socketID in connectionList){
 		// 	if(socketID != socket.id){
-		// 		conenctionList[socketID].emit('publish', data);
+		// 		connectionList[socketID].emit('publish', data);
 		// 	}
 		// }
 
@@ -363,30 +405,32 @@ io.sockets.on('connection', function(socket){
 				
 			if(command == 'list'){
 				response = 'The user list is as follows:<br>';
-				for(var socketID in conenctionList){
-					if(socketID != socket.id)
-						response += (socketID + '<br>');
+				for(var socketID in connectionList){
+					if(socketID != socket.id){
+						// if(connectionList)
+						response += (socketID + ': ' + connectionList[socketID].username + '<br>');
+					}
 				}
 				socket.emit('publish', response);
 			}else if(command == 'pvt'){
 				var user = args[1];
 				var msg = args[2];
-			 	if(conenctionList[user] == undefined){z
+			 	if(connectionList[user] == undefined){z
 					socket.emit('publish', 'Specified user does not exist');
 				}else{
-					conenctionList[user].emit('publish', '[Private @ ' + socket.id + ']: ' + msg);
+					connectionList[user].socket.emit('publish', '[Private @ ' + socket.id + ']: ' + msg);
 					socket.emit('publish', '[Private - ' + user + ']: ' + msg);
 				}
 			}else{
 				socket.emit('publish', 'Invalid Command');
 			}
 		}else{
-			io.sockets.emit('publish', data);
+			io.sockets.emit('publish', connectionList[socket.id].username + ': ' + data);
 		}
 	});
 	socket.on('disconnect', function(){
 		console.log("Connection closed, removing socket..");
-		delete conenctionList[socket.id];
+		delete connectionList[socket.id];
 	});
 });
 

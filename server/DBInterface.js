@@ -3,7 +3,7 @@
 var MongoClient = require('mongodb').MongoClient;
 var ObjectID = require('mongodb').ObjectID;
 var assert = require('assert');
-var defaultToken = ['raccon', 'fox'];
+var defaultToken = ['raccoon', 'fox'];
 var anonymousUserObjectID = null;
 var anonymousUserPassword = 'lfcd61tavjvrzwnx';
 
@@ -158,33 +158,38 @@ class DBInterface{
 		this.connect(function(){
 			var collection = _this._db.collection('users');
 			collection.findOne({_id : userAccountObjectID}, function(findUserErr, user){
+				console.log('User found');
 				if(!user){
-					callback(null);
+					callback(null); 
+					// console.log('reached 0');
 				}else{
 					var gameHistory = user.gameHistory;
 					var gameCollection = _this._db.collection('gamecollection');
 
+					// console.log('game collection found');
 					gameCollection.find({_id : {$in : gameHistory}}).toArray(function(findGameErr, gameObjects){
-						for (var i = 0; i < gameObjectIDs.length; i++) {
+						console.log('gameObjects: ' + gameObjects);
+						for (var i = 0; i < gameObjects.length; i++) {
 							var gameObject  = gameObjects[i];
+							var thisI = i;
 							delete gameObject['moveHistory'];
-							this.getAccountInfo(gameObject.player1, function(player1UserObj){
+							_this.getAccountInfo(gameObject.player1, function(player1UserObj){
 								gameObject.player1 = player1UserObj.username;
-								this.getAccountInfo(gameObject.player2, function(player2UserObj){
+								_this.getAccountInfo(gameObject.player2, function(player2UserObj){
 									gameObject.player2 = player2UserObj.username;
-									if(i == gameObjectIDs.length - 1){
-										callback(gameObjects);
+									if(thisI == (gameObjects.length - 1)){
+										callback(gameObjects); 
+										// console.log('reached 1');
 									}
 								});
 							});
 						}
-
 					});
 					if(gameHistory.length == 0){
-						callback([]);
+						callback([]); 
+						// console.log('reached 2');
 					}
 				}
-
 			});
 		});
 	}

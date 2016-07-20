@@ -8,6 +8,7 @@ var player2Passed = false;
 var accountHolderTokenType = null;
 var player1UserName = null;
 var player2UserName = null;
+var primaryAccountUserName = null;
 
 // Authentication function
 function auth(username, password, callback){
@@ -48,6 +49,7 @@ function auth(username, password, callback){
 		if(saveCredentialToCookie){
 			setCookie('username', username, 365);
 			setCookie('password', password, 365);
+			primaryAccountUserName = username;
 			callback(true, result);
 		}else{
 			callback(false, result);
@@ -161,9 +163,7 @@ function makeMove(x, y, c, pass, callback) {
 	var moveObj = {x: x, y: y, c: c, pass: pass};
 	socket.emit('makeMove', moveObj, function(result) {
 		console.log('Move result: ' + result);
-		if(result >= 0){
-			updateGameStatus();
-		}else{
+		if(result < 0){
 			alert('Invalid move: status code: ' + result);
 		}
 		if(callback){
@@ -178,14 +178,40 @@ function changeTokenImgs(tokenIds) {
 	})
 }
 
-function sendMessage(message){
-	socket.emit('publish', message);
+function getGameHistory(callback){
+	socket.emit('getGameHistory', null, function(gameHistoryList){
+		console.log(gameHistoryList);
+		if(callback){
+			callback(gameHistoryList);
+		}
+	});
+}
+
+function sendMessage(msg) {
+	socket.emit('publish', msg);
+}
+
+// Get all the information of a specific game, including move history (for playback)
+function getGameDetail(gameObjectID, callback){
+	socket.emit('getGameDetail', gameObjectID, function(result){
+		console.log(result);
+		if(callback){
+			callback(result);
+		}
+	});
 }
 
 socket.on('actionRequired', function(action){
 	switch(action){
 		case 0:
 			updateGameStatus();
+			break;
+		case 1:
+			// When the client received the logout request from the server
+			// Close the socket connection and display a warning message
+			// The connection will not be reestablished until the user refresh the page
+			socket.close();
+			alert('Account logged in elsewhere. Please refresh the page to reconnect.', 'Warning');
 			break;
 		default:
 			console.log('Unsupported action');
@@ -200,22 +226,34 @@ socket.on('publish', function(data) {
 socket.on('connect', function(){
 	var credential = getCredentialCookie();
 	auth(credential.username, credential.password, function(isSucceed, statusNo){
-		if(isSucceed){
-			getAccountInfo(function(accountInfoObj) {
-				if(accountInfoObj.currentGame){
-					// There's an unfinished game, continue automatically
-					continueGame(accountInfoObj.currentGame, null, function(gameInfo){
-						// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
-						console.log('Unfinished game detected, automatically resume.');
-						updateGameStatus();
-					});
-				}
-				var player1TokenID = accountInfoObj.tokenId[0];
-				var player2TokenID = accountInfoObj.tokenId[1];
-				// Set token images here;
-				console.log('Set token images to: P1: ' + player1TokenID + ', P2: ' + player2TokenID);
-			});
-		}
+		initialize(credential.username, credential.password, isSucceed);
 	});
 });
 
+function initialize(username, password, isSucceed) {
+	if(isSucceed){
+		getAccountInfo(function(accountInfoObj) {
+			if(accountInfoObj.currentGame){
+				// There's an unfinished game, continue automatically
+				continueGame(accountInfoObj.currentGame, null, function(gameInfo){
+					// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
+					console.log('Unfinished game detected, automatically resume.');
+					// updateGameStatus();
+				});
+			}
+			var player1TokenID = accountInfoObj.tokenId[0];
+			var player2TokenID = accountInfoObj.tokenId[1];
+			// Set token images here;
+			console.log('Set token images to: P1: ' + player1TokenID + ', P2: ' + player2TokenID);
+
+			player1.token = player1TokenID;
+			player2.token = player2TokenID;
+
+			if (username.substring(0,5) !== "temp_") {
+				player1.username = username;
+				login();
+			}
+
+		});
+	}
+}
