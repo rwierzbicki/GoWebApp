@@ -1,6 +1,7 @@
 var history = {
 	list: [],
-	currHistoryIndex: 0
+	currHistoryIndex: 0,
+	intervalID : null
 }
 
 
@@ -61,8 +62,12 @@ function clickReplayGame(event) {
 
 		history.list = data.moveHistory;
 		history.currHistoryIndex = 0;
-		if (data.moveHistory.length > 1)
+		history.playStarted = false;
+		if (data.moveHistory.length > 1){
 			$('#next-board-button').show();
+			$('#play-history-button').show();
+			$('#play-history-button').html('&#9658;');
+		}
 
 		if (primary === 1 && data.player2 === player1.username) {
 			swapPlayerTokens();
@@ -88,15 +93,50 @@ function clickPrevBoard(event) {
 	history.currHistoryIndex -= 1;
 	if (history.currHistoryIndex === 0)
 		$('#prev-board-button').hide();
+	clearInterval(history.intervalID);
+	$('#play-history-button').html('&#9658;');
 	renderHistoryGameBoard();
 	updateHistoryInfo();
 }
 
-function clickNextBoard(event) {
+function clickPlayBoard(event) {
+	if(!history.intervalID){
+		history.intervalID = setInterval(function(){
+			if($('#play-history-button').css('display') == 'none'){
+				clearInterval(history.intervalID);
+				history.intervalID = null;
+				return;
+			}
+			if(history.currHistoryIndex == history.list.length - 1){
+				clearInterval(history.intervalID);
+				history.intervalID = null;
+				$('#play-history-button').html('&#65517;');
+			}else{
+				clickNextBoard(null, true);
+			}
+		}, 1000);
+		history.playStarted = true;
+		$('#play-history-button').html('&#8214;');
+	}else{
+		clearInterval(history.intervalID);
+		history.intervalID = null;
+		$('#play-history-button').html('&#9658;');
+	}
+
+}
+
+function clickNextBoard(event, isAuto) {
 	$('#prev-board-button').show();
 	history.currHistoryIndex += 1;
-	if (history.currHistoryIndex === history.list.length-1)
+	if (history.currHistoryIndex === history.list.length-1){
+		$('#play-history-button').html('&#65517;');
 		$('#next-board-button').hide();
+	}
+	if(!isAuto){
+		clearInterval(history.intervalID);
+		history.intervalID = null;
+		$('#play-history-button').html('&#9658;');
+	}
 	renderHistoryGameBoard();
 	updateHistoryInfo();
 }

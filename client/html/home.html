@@ -157,6 +157,7 @@
             		<div id="history-controls" class="center-horizontal">
             			<strong>View History</strong><br>
 	            		<button id="prev-board-button" class="btn btn-default initially-hidden"><</button>
+	            		<button id="play-history-button" class="btn btn-default initially-hidden">&#9658;</button>
 	            		<button id="next-board-button" class="btn btn-default initially-hidden">></button>
 	            		<div id="board-page-number"></div>
 		            </div>
@@ -201,6 +202,15 @@
             </table>
 	    </div>
 
+	    <!--=================================BACKGROUND MUSIC============================-->
+
+		<div id='music-control-panel'>
+			<img id="playButton" src="assets/pause.png" style="width:20px;height:20px;">
+			<img id="muteButton" src="assets/volume.png" style="width:20px;height:20px;">
+			<strong id="musicTitle"></strong>
+			<input id="volumeslider" type="range" min="0" max="100" value="25" step="1">
+		</div>
+
 	    <!-- Bootstrap core JavaScript
 	    ================================================== -->
 	    <!-- Placed at the end of the document so the pages load faster -->
@@ -211,14 +221,6 @@
 	    <script src="javascript/history.js"></script>
 	    <script src="javascript/home.js"></script>
 	    <script src="javascript/backgroundMusic.js"></script>
-
-	    <!--=================================BACKGROUND MUSIC================================-->
-		<div id='music-control-panel'>
-			<img id="playButton", src="assets/pause.png", style="width:20px;height:20px;">
-			<img id="muteButton" src="assets/volume.png" style="width:20px;height:20px;">
-			<strong id="musicTitle"></strong>
-			<input id="volumeslider" type="range" min="0" max="100" value="25" step="1">
-		</div>
   	</body>
 
 </html>

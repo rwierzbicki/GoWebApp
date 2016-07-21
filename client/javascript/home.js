@@ -13,6 +13,7 @@ window.onload = function() {
 	$('#logout-button').click(logout);
 	$('#chooseTokenModal').on('show.bs.modal', onTokenModalOpened);
 	$('#prev-board-button').click(clickPrevBoard);
+	$('#play-history-button').click(clickPlayBoard);
 	$('#next-board-button').click(clickNextBoard);
 	$('#pass-button').click(clickPass);
 
