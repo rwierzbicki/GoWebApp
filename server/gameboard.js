@@ -237,7 +237,7 @@ function makeMove(board, y, x, colour, lastMove, fn) {
         var tempLastMove = {
         	x : lastMove.pass? 0: lastMove.y,
         	y : lastMove.pass? 0: lastMove.x,
-        	c : lastMove.pass? 0: lastMove.c,
+        	c : lastMove.c,
         	pass : lastMove.pass
         };
 
