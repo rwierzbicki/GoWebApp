@@ -28,9 +28,14 @@
   opacity: 1;
 }
 
+.table > tbody > tr > td.center-cell-contents  {
+  vertical-align: middle;
+  text-align: center;
+}
+
 .player-token {
-  height: 50px;
-  width: 50px;
+  height: 60px;
+  width: 60px;
 }
 
 .choose-token-image {
@@ -45,6 +50,10 @@
 
 .choose-token-image.taken {
   filter: brightness(40%);
+}
+
+.center-horizontal {
+  text-align: center;
 }
 
 /* need this to make the gameboard dynamic */

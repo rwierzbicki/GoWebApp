@@ -34,12 +34,6 @@
 		       		</div>
 		          	<ul class="nav navbar-nav pull-right">
 		            	<li><a href="#loginModal" id="login-button" class="login-button" data-toggle="modal">Login</a></li>
-
-<!-- 		            	<ul>
-		            	<input id="volumeslider" type="range" min="0" max="100" value="25" step="1">
-		            	<img id="playButton", src="assets/pause.png", style="width:20px;height:20px;">
-						<img id="muteButton" src="assets/volume.png" style="width:20px;height:20px;">
-						</ul> -->
 		            </ul>
 		            <ul class="nav navbar-nav pull-right initially-hidden">
 	            		<li class="dropdown">
@@ -138,24 +132,34 @@
             	<div id="gameboard-container" class="col-md-8"></div>
             	<div class="col-md-4">
             		<table class="table">
-	            		<tr id="player-1"><td>
-	            			<h4 id="p1-name"></h4>
-	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p1-token" class="player-token"/></a>
-	            			<br>Captured Tokens: <span id="p1-captured-tokens"></span>
-	            			<button id="p1-pass-button" class="btn btn-default">Pass</button>
-	            		</td></tr>
-	            		<tr id="player-2"><td>
-	            			<h4 id="p2-name"></h4>
-	            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p2-token" class="player-token"/></a>
-	            			<br>Captured Tokens: <span id="p2-captured-tokens"></span></h4>
-	            			<button id="p2-pass-button" class="btn btn-default">Pass</button>
-	            		</td></tr>
-	            		<tr><td id="history-controls">
-	            			<button id="prev-board-button" class="btn btn-default initially-hidden">Previous</button>
-	            			<button id="next-board-button" class="btn btn-default initially-hidden">Next</button>
-	            			<div id="board-page-number"></div>
-	            		</td></tr>
+	            		<tr id="player-1">
+	            			<td  class="center-cell-contents">
+		            			<a href="#chooseTokenModal" class="player-token" data-toggle="modal"><img id="p1-token" class="player-token"/></a>
+		            		</td>
+		            		<td>
+		            			<h4 id="p1-name"></h4>
+		            			Captured Tokens: <span id="p1-captured-tokens"></span>
+		            			<div id="p1-passed">Passed</div>
+	            			</td>
+	            		</tr>
+	            		<tr id="player-2">
+	            			<td class="center-cell-contents">
+		            			<a href="#chooseTokenModal" data-toggle="modal"><img id="p2-token" class="player-token"/></a>
+		            		</td>
+		            		<td>
+		            			<h4 id="p2-name"></h4>
+		            			Captured Tokens: <span id="p2-captured-tokens"></span>
+		            			<div id="p2-passed" class="">Passed</div>
+	            			</td>
+	            		</tr>
 	            	</table>
+	            	<div class="center-horizontal"><button id="pass-button" class="btn btn-default centerBlock">Pass</button></div>
+            		<div id="history-controls" class="center-horizontal">
+            			<strong>View History</strong><br>
+	            		<button id="prev-board-button" class="btn btn-default initially-hidden"><</button>
+	            		<button id="next-board-button" class="btn btn-default initially-hidden">></button>
+	            		<div id="board-page-number"></div>
+		            </div>
             	</div>
             </div>
 	    </div>
@@ -186,7 +190,7 @@
          	<table class="table">
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th>Date Started</th>
                         <th>Player 1</th>
                         <th>Player 2</th>
                         <th></th>
@@ -208,8 +212,7 @@
 	    <script src="javascript/home.js"></script>
 	    <script src="javascript/backgroundMusic.js"></script>
 
-
-	     <!--=================================BACKGROUND MUSIC================================-->
+	    <!--=================================BACKGROUND MUSIC================================-->
 		<div id='music-control-panel'>
 			<img id="playButton", src="assets/pause.png", style="width:20px;height:20px;">
 			<img id="muteButton" src="assets/volume.png" style="width:20px;height:20px;">
@@ -217,4 +220,5 @@
 			<input id="volumeslider" type="range" min="0" max="100" value="25" step="1">
 		</div>
   	</body>
+
 </html>

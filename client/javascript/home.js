@@ -14,10 +14,8 @@ window.onload = function() {
 	$('#chooseTokenModal').on('show.bs.modal', onTokenModalOpened);
 	$('#prev-board-button').click(clickPrevBoard);
 	$('#next-board-button').click(clickNextBoard);
-	$('#p1-pass-button').click(clickPass);
-	$('#p2-pass-button').click(clickPass);
+	$('#pass-button').click(clickPass);
 
-	loadGameHistory();
 	loadTokenSelectionModal();
 	backgroundMusicInit();
 }
@@ -40,10 +38,11 @@ function showNewGamePage() {
 function showGamePage() {
 	$('.page-section').hide();
 	$('#history-controls').hide();
+	$('#pass-button').show();
 	$('#game-page').show();
 	$('#logo').show();
 	pageSwitched();
-	replay = false;
+	updatePlayerNames();
 }
 
 function showHistoryPage() {
@@ -118,7 +117,6 @@ function login() {
 	$('#login-button').parent().parent().hide();
 	$('#username-button').html(player1.username + '<b class="caret"></b>');
 	$('#username-button').parent().parent().show();
-
 	updatePlayerInfo();
 	loadTokenSelectionModal();
 }

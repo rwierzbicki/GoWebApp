@@ -65,7 +65,26 @@ function continueGame(gameID, gameParameters, callback) {
 		player1UserName = gameInfo.player1;
 		player2UserName = gameInfo.player2;
 		accountHolderTokenType = gameInfo.accountHolderTokenType;
-		callback(gameInfo);
+
+		if(callback)
+			callback(gameInfo);
+
+		board.setSize(gameInfo.boardSize);
+        board.hotseat = (gameInfo.gameMode === 0);
+
+        if (primary === 1 && gameInfo.player2 === player1.username) {
+			primary = 2;
+			swapPlayerTokens();
+		} else if (primary === 2 && gameInfo.player1 === player2.username) {
+			primary = 1;
+			swapPlayerTokens();
+		}
+
+		player1.username = gameInfo.player1;
+		player2.username = gameInfo.player2;
+
+		updatePlayerNames();
+		showGamePage();
 	});
 }
 
@@ -163,7 +182,6 @@ function updateGameStatus(callback){
         player1.capturedTokens = data.player1CapturedTokens;
         player2.passed = data.player2Passed;
         player2.capturedTokens = data.player2CapturedTokens;
-        makeGameBoard();
         updatePlayerInfo();
         renderUnfinishedGameBoard();
 
@@ -262,11 +280,6 @@ function initialize(username, password, isSucceed) {
 				continueGame(accountInfoObj.currentGame, null, function(gameInfo){
 					// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
 					console.log('Unfinished game detected, automatically resume.');
-					
-					board.setSize(gameInfo.boardSize);
-                    board.hotseat = (gameInfo.gameMode === 0);
-                    showGamePage();
-
 				});
 			}
 			var player1TokenID = accountInfoObj.tokenId[0];
@@ -276,6 +289,8 @@ function initialize(username, password, isSucceed) {
 
 			player1.token = player1TokenID;
 			player2.token = player2TokenID;
+			
+			updatePlayerTokens();
 
 			if (username.substring(0,5) !== "temp_") {
 				player1.username = username;

@@ -41,35 +41,35 @@ var playerNewToken; // which player is changing their token
 
 var isLoading = false;
 
-/**
- * Loads each player's name, token, captured tokens, and passed state onto
- * the screen as well as highlighting the current player
- */
-function updatePlayerInfo() {
-
-	// USERNAME
-
+// Load each players' names onto game page
+function updatePlayerNames() {
 	// if player 1 signed in, use username else "Player 1"
-	if (player1.username)
-		document.getElementById('p1-name').innerHTML = player1.username;
-	else
+	if (player1.username === "anonymous")
 		document.getElementById('p1-name').innerHTML = "Player 1";	
+	else
+		document.getElementById('p1-name').innerHTML = player1.username;
 
 	// if player 2 signed in, use username else if
 	// hotseat, "Player 2", if not hotseat, "CPU"
-	if (player2.username)
+	if (!board.hotseat)
+		document.getElementById('p2-name').innerHTML = "CPU";
+	else if (!player2.username || player2.username === "anonymous")
+		document.getElementById('p2-name').innerHTML = "Player 2";
+	else
 		document.getElementById('p2-name').innerHTML = player2.username;
-	else {
-		if (board.hotseat)
-			document.getElementById('p2-name').innerHTML = "Player 2";
-		else
-			document.getElementById('p2-name').innerHTML = "CPU";
-	}
+}
 
-	// TOKEN
-	
+// Load players' tokens onto game page
+function updatePlayerTokens() {
 	document.getElementById('p1-token').src = TOKEN_IMGS[player1.token];
 	document.getElementById('p2-token').src = TOKEN_IMGS[player2.token];
+}
+
+/**
+ * Load each player's captured tokens, and passed state onto
+ * game page as well as highlighting the current player
+ */
+function updatePlayerInfo() {
 
 	// CAPTURED TOKENS
 
@@ -79,15 +79,15 @@ function updatePlayerInfo() {
 	// PASSED
 
 	if (player1.passed) {
-		$('#p1-pass-button').addClass("active");
+		$('#p1-passed').css('visibility','visible');
 	} else {
-		$('#p1-pass-button').removeClass("active");
+		$('#p1-passed').css('visibility','hidden');
 	}
 
 	if (player2.passed) {
-		$('#p2-pass-button').addClass("active");
+		$('#p2-passed').css('visibility','visible');
 	} else {
-		$('#p2-pass-button').removeClass("active");
+		$('#p2-passed').css('visibility','hidden');
 	}
 	
 	// HIGHLIGHT CURRENT PLAYER
@@ -102,14 +102,6 @@ function updatePlayerInfo() {
 }
 
 function clickPass(event) {
-	if (replay)
-		return;
-
-	if ((event.target.id === "p1-pass-button" && currPlayer !== 1) || (event.target.id === "p2-pass-button" && currPlayer !== 2)) {
-		showAlert("You can only pass on your turn!");
-		return;
-	}
-
 	makeMove(0, 0, currPlayer, true, function(result) {
 		if (result < 0) {
 			showAlert("result = " + result);
@@ -298,14 +290,3 @@ function swapPlayerTokens() {
 	player1.token = player2.token;
 	player2.token = temp;
 }
-
-/**
- * Returns a token image which is not already taken
- * (more specifically, the next available token)
- *
- * @param token {key in TOKEN_IMGS} token which is already taken
- */
-/*function getOtherToken(token) {
-	keys = Object.keys(TOKEN_IMGS);
-	return keys[(keys.indexOf(token)+1)%keys.length];
-}*/
