@@ -262,6 +262,39 @@ function updateUnplacedTokens() {
 		unplacedTokens[i].setAttributeNS('http://www.w3.org/1999/xlink','href', imgPath);
 }
 
+function onFinishedGame(score1, score2) {
+	var names = getScreenNames();
+
+	if (board.hotseat) {
+		var str = "Congratulations <strong>"
+		if (score1 > score2)
+			str += names.player1;
+		else
+			str += names.player2;
+		str += "</strong>, you won!"
+		$('#finished-game-text').html(str);
+	} else {
+		if (score1 > score2) 
+			$('#finished-game-text').html("Nice going, you won!");
+		else
+			$('#finished-game-text').html("There will be a time when we are all bested by robots. It's starting.");
+	}
+	
+
+	$('#finish-p1-name').html(names.player1);
+    $('#finish-p1-score').html(score1);
+
+	$('#finish-p2-name').html(names.player2);
+    $('#finish-p2-score').html(score2);
+
+    $('#game-finished-modal').modal('show');
+}
+
+function onFinishedGameModalClosed() {
+    showHomePage();
+}
+
+
 /**
  * Converts board from list to 2D array
  *
@@ -289,4 +322,24 @@ function swapPlayerTokens() {
 	var temp = player1.token;
 	player1.token = player2.token;
 	player2.token = temp;
+}
+
+function getScreenNames() {
+	var p1;
+	var p2;
+
+	if (player1.username === "anonymous")
+        p1 = "Player 1";
+    else
+        p1 = player1.username;
+
+    if (!board.hotseat)
+        p2 = "CPU";
+    else if (player2.username === "anonymous")
+        p2 = "Player 2";
+    else
+        p2 = player1.username;
+
+
+	return { player1: p1, player2: p2 };
 }

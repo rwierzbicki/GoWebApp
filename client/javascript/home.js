@@ -12,9 +12,14 @@ window.onload = function() {
 	$('#game-history-button').click(showHistoryPage);
 	$('#logout-button').click(logout);
 	$('#chooseTokenModal').on('show.bs.modal', onTokenModalOpened);
+	$('#game-finished-modal').on('hide.bs.modal', onFinishedGameModalClosed);
 	$('#prev-board-button').click(clickPrevBoard);
 	$('#next-board-button').click(clickNextBoard);
 	$('#pass-button').click(clickPass);
+	$('#new-game-button').click(function() {
+		$('#game-finished-modal').modal('hide');
+		showNewGamePage();
+	})
 
 	loadTokenSelectionModal();
 	backgroundMusicInit();
@@ -133,7 +138,7 @@ function logout() {
  */
 function showAlert(text, header) {
 	var div = document.createElement("div");
-	div.className = "alert alert-warning alert-dismissible fade in";
+	div.className = "alert alert-success alert-dismissible fade in";
 	div.setAttribute("role", "alert");
 
 	var closeBtn = document.createElement("button");

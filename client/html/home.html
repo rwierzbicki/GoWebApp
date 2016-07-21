@@ -48,8 +48,6 @@
 		  	</nav>
 	  	</div>
 
-	  	<div id="alert" class="container initially-hidden"></div>
-
 	  	<!--============================== LOGIN MODAL ================================-->
 
 	  	<div id="loginModal" class="modal fade" role="dialog">
@@ -164,6 +162,38 @@
             </div>
 	    </div>
 
+	    <!--============================GAME FINISHED MODAL============================-->
+
+        <div id="game-finished-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-md">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Game finished</h4>
+                    </div>
+                    <div class="modal-body">
+                    	<div id="finished-game-text"></div><br>
+
+                    	<table class="table">
+	                        <tr>
+	                            <td id="finish-p1-name"></td>
+	                            <td id="finish-p1-score"></td>
+	                        </tr>
+	                        <tr>
+	                            <td id="finish-p2-name"></td>
+	                            <td id="finish-p2-score"></td>
+	                        </tr>
+	                    </table>
+                        <div class="center-horizontal"><button id="new-game-button" type="button" class="btn btn-default">New Game</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
 	    <!--============================TOKEN SELECTION MODAL============================-->
 
 	    <div id="chooseTokenModal" class="modal fade" role="dialog">
@@ -200,6 +230,10 @@
                 </tbody>
             </table>
 	    </div>
+
+	    <!--=====================================ALERT===================================-->
+
+	  	<div id="alert" class="container initially-hidden"></div>
 
 	    <!-- Bootstrap core JavaScript
 	    ================================================== -->
