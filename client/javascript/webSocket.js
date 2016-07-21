@@ -84,7 +84,6 @@ function continueGame(gameID, gameParameters, callback) {
 		player2.username = gameInfo.player2;
 
 		updatePlayerNames();
-		showGamePage();
 	});
 }
 
@@ -186,6 +185,8 @@ function updateGameStatus(callback){
         renderUnfinishedGameBoard();
 
         isLoading = false;
+		showGamePage();
+
 	});
 }
 
@@ -249,11 +250,13 @@ socket.on('actionRequired', function(action){
 			// Close the socket connection and display a warning message
 			// The connection will not be reestablished until the user refresh the page
 			socket.close();
-			alert('Account logged in elsewhere. Please refresh the page to reconnect.', 'Warning');
+			showAlert('Account logged in elsewhere. Please refresh the page to reconnect.', 'Warning');
 			break;
 		case 2:
 			// When the game is finished, following code will be executed
-			alert('Game finished :)');
+			//alert('Game finished :)');
+			//onFinishedGame(score1, score2);
+			onFinishedGame(Math.floor((Math.random() * 100) + 1), Math.floor((Math.random() * 100) + 1));
 			break;
 		default:
 			console.log('Unsupported action');
