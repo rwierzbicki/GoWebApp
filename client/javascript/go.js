@@ -39,6 +39,8 @@ var board = {
 var currPlayer;
 var playerNewToken; // which player is changing their token
 
+var isLoading = false;
+
 /**
  * Loads each player's name, token, captured tokens, and passed state onto
  * the screen as well as highlighting the current player
@@ -103,22 +105,17 @@ function clickPass(event) {
 	if (replay)
 		return;
 
-	if (currPlayer === 1 && event.target.id === "p1-pass-button") {	// if player 1 passed
-		player1.passed = true;
-		currPlayer = 2;
-	} else if (currPlayer === 2 && event.target.id === "p2-pass-button") {
-		if (player1.passed) {
-			player2.passed = true;
-			alert("This game is finished");	// TODO end game!
-		} else {
-			currPlayer = 1;
-		}
-	} else {
-		alert("You can only pass on your turn!");
+	if ((event.target.id === "p1-pass-button" && currPlayer !== 1) || (event.target.id === "p2-pass-button" && currPlayer !== 2)) {
+		showAlert("You can only pass on your turn!");
+		return;
 	}
 
-	updatePlayerInfo();
-	updateUnplacedTokens();
+	makeMove(0, 0, currPlayer, true, function(result) {
+		if (result < 0) {
+			showAlert("result = " + result);
+			isLoading = false;
+		}
+	});
 }
 
 // load tokens into Token Selection Modal
@@ -230,18 +227,27 @@ function makeGameBoard() {
 
 function onClickToken(event) {
 	var token = event.target;
+
 	if (token.getAttribute("class") !== "token-image unplaced")
 		return;
-
-	token.setAttribute("class", "token-image placed " + currPlayer);
-	
-	if (board.hotseat) {
-		currPlayer = (currPlayer === 1 ? 2 : 1);
+	if (isLoading) {
+		showAlert("Our hamsters are taking a break", "One moment");
+		return;
 	}
 
-	player1.passed = false;
-	updatePlayerInfo();
-	updateUnplacedTokens();
+	isLoading = true;
+
+	makeMove(parseInt(token.getAttribute("X")), parseInt(token.getAttribute("Y")), currPlayer, false, function(result) {
+		switch(result) {
+			case -2:
+				showAlert("That move would recreate the past board state!", "Ko Move");
+				isLoading = false;
+				break;
+			case -3:
+				showAlert("That move would cause your army to be immediately captured!", "Suicide");
+				isLoading = false;
+		}
+	});
 	
 }
 

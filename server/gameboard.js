@@ -80,7 +80,7 @@ function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard,
             console.log(res);
             //CASE 2: suicidal
             if(res.captured === 0){
-                if(suicide(currBoard, x,y,colour)){
+                if(suicide(tempBoard, x,y,colour)){
                     //status = -3;
                     fn(-3);
                 }else{
@@ -108,29 +108,18 @@ function validateMoveAndCalculateCapturedTokens(prevBoard, currBoard, tempBoard,
  * Determines if playing a move would result in suicide
  * Note: apply army captures first
  *
- * @param board {2D array}
+ * @param board {2D array} has move in question applied
  * @param x {int} x coordinate of token
  * @param y {int} y coordinate of token
  * @param colour {int} colour of token
  * @return {boolean} true if move would result in suicide 
  */
-
-function suicide(board, x, y, colour) {
-	var oppColour = (colour === 1? 2 : 1);
-
-    var dx = [-1, 0, 1, 0];
-    var dy = [0, 1, 0, -1];
-
-    for (var direction = 0; direction < 4; direction++) {
-        var neighbourX = x + dx[direction];
-        var neighbourY = y + dy[direction];
-        if (inBounds(board, neighbourX, neighbourY) && board[neighbourY][neighbourX] !== oppColour) {
-            return false;
-        }
+function suicide(tempBoard, x, y, colour) {
+    var wouldBeCaptured = territoryDetector.getCapturedTokens(tempBoard);
+    if (colour === 1) {
+        return (wouldBeCaptured.capturedBlackArmyList.length > 0);
     }
-
-    return true;
-	
+    return (wouldBeCaptured.capturedWhiteArmyList.length > 0);
 }
 
 /**

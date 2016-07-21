@@ -156,6 +156,18 @@ function updateGameStatus(callback){
 		if(callback){
 			callback(data);
 		}
+
+		board.state = data.board;
+        currPlayer = data.currentTurn;
+        player1.passed = data.player1Passed;
+        player1.capturedTokens = data.player1CapturedTokens;
+        player2.passed = data.player2Passed;
+        player2.capturedTokens = data.player2CapturedTokens;
+        makeGameBoard();
+        updatePlayerInfo();
+        renderUnfinishedGameBoard();
+
+        isLoading = false;
 	});
 }
 
@@ -163,9 +175,6 @@ function makeMove(x, y, c, pass, callback) {
 	var moveObj = {x: x, y: y, c: c, pass: pass};
 	socket.emit('makeMove', moveObj, function(result) {
 		console.log('Move result: ' + result);
-		if(result < 0){
-			alert('Invalid move: status code: ' + result);
-		}
 		if(callback){
 			callback(result);
 		}
@@ -187,8 +196,19 @@ function getGameHistory(callback){
 	});
 }
 
-function sendMessage(msg) {
-	socket.emit('publish', msg);
+function sendRegularMessage(msg) {
+	socket.emit('control', {command : 'regularMessage', msg});
+}
+
+function getUserList(callback){
+	socket.emit('control', {command : 'getUserList'}, function(result){
+		console.log(result.userList);
+		callback(result);
+	});
+}
+
+function sendPrivateMessage(username, msg){
+	socket.emit('control', {command : 'privateMessage', username : username, msg : msg});
 }
 
 // Get all the information of a specific game, including move history (for playback)
@@ -212,6 +232,10 @@ socket.on('actionRequired', function(action){
 			// The connection will not be reestablished until the user refresh the page
 			socket.close();
 			alert('Account logged in elsewhere. Please refresh the page to reconnect.', 'Warning');
+			break;
+		case 2:
+			// When the game is finished, following code will be executed
+			alert('Game finished :)');
 			break;
 		default:
 			console.log('Unsupported action');
@@ -238,7 +262,11 @@ function initialize(username, password, isSucceed) {
 				continueGame(accountInfoObj.currentGame, null, function(gameInfo){
 					// Resume game status here (i.e. tokens on the board, turn, steps, etc.)
 					console.log('Unfinished game detected, automatically resume.');
-					// updateGameStatus();
+					
+					board.setSize(gameInfo.boardSize);
+                    board.hotseat = (gameInfo.gameMode === 0);
+                    showGamePage();
+
 				});
 			}
 			var player1TokenID = accountInfoObj.tokenId[0];
