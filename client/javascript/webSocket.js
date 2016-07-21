@@ -241,7 +241,7 @@ function getGameDetail(gameObjectID, callback){
 }
 
 socket.on('actionRequired', function(action){
-	switch(action){
+	switch(action.code){
 		case 0:
 			updateGameStatus();
 			break;
@@ -256,7 +256,8 @@ socket.on('actionRequired', function(action){
 			// When the game is finished, following code will be executed
 			//alert('Game finished :)');
 			//onFinishedGame(score1, score2);
-			onFinishedGame(Math.floor((Math.random() * 100) + 1), Math.floor((Math.random() * 100) + 1));
+			onFinishedGame(action.data.score1, action.data.score2);
+			// onFinishedGame(Math.floor((Math.random() * 100) + 1), Math.floor((Math.random() * 100) + 1));
 			break;
 		default:
 			console.log('Unsupported action');

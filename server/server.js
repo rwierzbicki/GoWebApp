@@ -78,7 +78,7 @@ var initializeServer = function() {
 		var aiRetryThreshold = 10;
 
 		var notifyClientForUpdate = function(){
-			socket.emit('actionRequired', 0, function(){
+			socket.emit('actionRequired', {code : 0, data : null}, function(){
 				console.log('Update notification sent');
 			});
 		}
@@ -177,7 +177,7 @@ var initializeServer = function() {
 			for (var socketID in connectionList) {
 				if(connectionList[socketID].username == _username){
 					console.log('Duplicate session detected');
-					connectionList[socketID].socket.emit('actionRequired', 1, function(){
+					connectionList[socketID].socket.emit('actionRequired', {code : 1, data : null}, function(){
 						console.log('logout request sent');
 					});
 				}
@@ -332,7 +332,7 @@ var initializeServer = function() {
 						};
 						db.endGame(userObjID, opponentAccountObjectID, currentGameID, gameRecord, function(){
 							console.log('Game ended');
-							socket.emit('actionRequired', 2, function() {
+							socket.emit('actionRequired', {code : 2, data : gameRecord}, function() {
 								console.log('End of game signal sent')
 							});
 						});
