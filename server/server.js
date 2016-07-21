@@ -40,6 +40,9 @@ var io = require('socket.io').listen(10086);
 
 var db = new dbInterface(null, null);
 
+// db.dropDatabase();
+// process.exit();
+
 db.connect(function(error){
 	if(error){
 		console.log('Database connection failed');

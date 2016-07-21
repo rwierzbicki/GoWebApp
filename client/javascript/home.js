@@ -1,3 +1,9 @@
+/*
+Background Music Reference: https://youtu.be/G_h17RhIzbc
+							https://youtu.be/P_xFh7XFC_w
+
+*/
+
 var userSigningIn; //which player is signing in
 
 window.onload = function() {
