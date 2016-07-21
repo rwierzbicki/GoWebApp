@@ -166,6 +166,14 @@ class DBInterface{
 					object.player2 = player2UserObj.username;
 					list.push(object);
 					if(list.length == length){
+						// Sort the list before sending back
+						list.sort(function(a, b){
+							var aTime = a['date'];
+							var bTime = b['date'];
+							if(aTime < bTime) return -1;
+							if(aTime > bTime) return 1;
+							return 0
+						});
 						callback(list); 
 						console.log('Sending back gameHistory');
 						// console.log('reached 1');
