@@ -61,3 +61,10 @@
  	left: 0;
  	bottom: 0;
 }
+
+#music-control-panel {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 15%;
+}

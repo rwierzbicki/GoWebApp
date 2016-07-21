@@ -34,6 +34,12 @@
 		       		</div>
 		          	<ul class="nav navbar-nav pull-right">
 		            	<li><a href="#loginModal" id="login-button" class="login-button" data-toggle="modal">Login</a></li>
+
+<!-- 		            	<ul>
+		            	<input id="volumeslider" type="range" min="0" max="100" value="25" step="1">
+		            	<img id="playButton", src="assets/pause.png", style="width:20px;height:20px;">
+						<img id="muteButton" src="assets/volume.png" style="width:20px;height:20px;">
+						</ul> -->
 		            </ul>
 		            <ul class="nav navbar-nav pull-right initially-hidden">
 	            		<li class="dropdown">
@@ -191,13 +197,11 @@
             </table>
 	    </div>
 
-	    <div id="music"></div>
 	    <!-- Bootstrap core JavaScript
 	    ================================================== -->
 	    <!-- Placed at the end of the document so the pages load faster -->
 	    <script src="js/jquery.min.js"></script>
 	    <script src="js/bootstrap.min.js"></script>
-
 	    <script src="javascript/svgFactory.js"></script>
 	    <script src="javascript/go.js"></script>
 	    <script src="javascript/history.js"></script>
@@ -206,6 +210,11 @@
 
 
 	     <!--=================================BACKGROUND MUSIC================================-->
-
+		<div id='music-control-panel'>
+			<img id="playButton", src="assets/pause.png", style="width:20px;height:20px;">
+			<img id="muteButton" src="assets/volume.png" style="width:20px;height:20px;">
+			<strong id="musicTitle"></strong>
+			<input id="volumeslider" type="range" min="0" max="100" value="25" step="1">
+		</div>
   	</body>
 </html>
