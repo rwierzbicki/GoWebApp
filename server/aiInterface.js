@@ -6,7 +6,7 @@ function getRandomMove(size, board, lastMove, cb){
 	var tempLastMove = {
 		x : lastMove.pass? 0: lastMove.y,
 		y : lastMove.pass? 0: lastMove.x,
-		c : lastMove.pass? 0: lastMove.c,
+		c : lastMove.c,
 		pass : lastMove.pass
 	};
 
@@ -45,7 +45,8 @@ function getRandomMove(size, board, lastMove, cb){
 		});
 	};
 
-
+	console.log(options);
+	console.log(postData);
 
 	var req = http.request(options, callback);
 

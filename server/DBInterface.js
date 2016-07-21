@@ -153,12 +153,31 @@ class DBInterface{
 		});
 	}
 
+
+
 	getGameHistory(userAccountObjectID, callback){
 		var _this = this;
+
+		var updateObjectList = function(object, length, list, callback){
+			delete object['moveHistory'];
+			_this.getAccountInfo(ObjectID(object.player1), function(player1UserObj){
+				object.player1 = player1UserObj.username;
+				_this.getAccountInfo(ObjectID(object.player2), function(player2UserObj){
+					object.player2 = player2UserObj.username;
+					list.push(object);
+					if(list.length == length){
+						callback(list); 
+						console.log('Sending back gameHistory');
+						// console.log('reached 1');
+					}
+				});
+			});
+		}
+
 		this.connect(function(){
 			var collection = _this._db.collection('users');
 			collection.findOne({_id : userAccountObjectID}, function(findUserErr, user){
-				console.log('User found');
+				console.log('User ' + user.username + ' is requesting for game history');
 				if(!user){
 					callback(null); 
 					// console.log('reached 0');
@@ -168,25 +187,13 @@ class DBInterface{
 
 					// console.log('game collection found');
 					gameCollection.find({_id : {$in : gameHistory}}).toArray(function(findGameErr, gameObjects){
-						console.log('gameObjects: ' + gameObjects);
-						for (var i = 0; i < gameObjects.length; i++) {
-							var gameObject  = gameObjects[i];
-							var thisI = i;
-							delete gameObject['moveHistory'];
-							_this.getAccountInfo(gameObject.player1, function(player1UserObj){
-								gameObject.player1 = player1UserObj.username;
-								_this.getAccountInfo(gameObject.player2, function(player2UserObj){
-									gameObject.player2 = player2UserObj.username;
-									if(thisI == (0)){
-										callback(gameObjects); 
-										// console.log('reached 1');
-									}
-								});
-							});
+						var tempGameObjectList = [];
+						for (var i in gameObjects) {
+							updateObjectList(gameObjects[i], gameObjects.length, tempGameObjectList, callback)
 						}
 					});
 					if(gameHistory.length == 0){
-						callback([]); 
+						callback([]);
 						// console.log('reached 2');
 					}
 				}
@@ -318,7 +325,7 @@ class DBInterface{
 	// Initialize the database with basic documents and collections
 	init(callback){
 		// Put initializations here if there are any
-		this.authenticateUser('anonymous', 'lfcd61tavjvrzwnx', function(userAccountObjectID, statusCode){
+		this.authenticateUser('anonymous', anonymousUserPassword, function(userAccountObjectID, statusCode){
 			anonymousUserObjectID = userAccountObjectID;
 			if(statusCode == 2){
 				console.log('Database initialization completed.');

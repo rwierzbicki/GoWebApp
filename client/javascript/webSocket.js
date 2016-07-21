@@ -187,8 +187,19 @@ function getGameHistory(callback){
 	});
 }
 
-function sendMessage(msg) {
-	socket.emit('publish', msg);
+function sendRegularMessage(msg) {
+	socket.emit('control', {command : 'regularMessage', msg});
+}
+
+function getUserList(callback){
+	socket.emit('control', {command : 'getUserList'}, function(result){
+		console.log(result.userList);
+		callback(result);
+	});
+}
+
+function sendPrivateMessage(username, msg){
+	socket.emit('control', {command : 'privateMessage', username : username, msg : msg});
 }
 
 // Get all the information of a specific game, including move history (for playback)
@@ -212,6 +223,10 @@ socket.on('actionRequired', function(action){
 			// The connection will not be reestablished until the user refresh the page
 			socket.close();
 			alert('Account logged in elsewhere. Please refresh the page to reconnect.', 'Warning');
+			break;
+		case 2:
+			// When the game is finished, following code will be executed
+			alert('Game finished :)');
 			break;
 		default:
 			console.log('Unsupported action');

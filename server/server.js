@@ -50,7 +50,7 @@ db.connect(function(error){
 
 var initializeServer = function() {
 	var io = require('socket.io').listen(10086);
-
+	console.log('WebSocket>>> Listening');
 	io.sockets.on('connection', function(socket){
 		console.log("Connection accepted: %s", socket.id);
 		// connectionList.push({id : socket.id, socket : socket});
@@ -76,7 +76,7 @@ var initializeServer = function() {
 
 		var notifyClientForUpdate = function(){
 			socket.emit('actionRequired', 0, function(){
-				console.log('update notification sent');
+				console.log('Update notification sent');
 			});
 		}
 
@@ -329,6 +329,9 @@ var initializeServer = function() {
 						};
 						db.endGame(userObjID, opponentAccountObjectID, currentGameID, gameRecord, function(){
 							console.log('Game ended');
+							socket.emit('actionRequired', 2, function() {
+								console.log('End of game signal sent')
+							});
 						});
 
 					}
@@ -402,55 +405,46 @@ var initializeServer = function() {
 			response(updateResponse);
 		});
 
-		socket.on('control', function(command, response){
-			if(command == 'getAuthStatus'){
+		socket.on('control', function(message, response){
+			if(message.command == 'getAuthStatus'){
 				response('' + isLoggedIn.toString());
 			}
-			if(command == 'dbTest'){
-
+			if(message.command == 'getUserList'){
+				var userList = [];
+				var replyMessage = 'The user list is as follows:<br>';
+				for(var socketID in connectionList){
+					if(connectionList[socketID].username == null){
+						continue;
+					}
+					if(socketID != socket.id){
+						userList.push(connectionList[socketID].username);
+						replyMessage += (socketID + ': ' + connectionList[socketID].username + '<br>');
+					}
+				}
+				response({userList : userList, replyMessage : replyMessage});
+			}
+			if(message.command == 'privateMessage'){
+				var sID = null;
+				for(var socketID in connectionList){
+					if(connectionList[socketID].username == message.username){
+						sID = socketID;
+						break;
+					}
+				}	
+			 	if(sID == null){
+					socket.emit('publish', 'Specified user does not exist');
+				}else{
+					connectionList[sID].socket.emit('publish', '[Private @ ' + username + ']: ' + message.msg);
+					socket.emit('publish', '[Private - ' + connectionList[sID].username + ']: ' + message.msg);
+				}
+			}
+			if(message.command == 'regularMessage'){
+				io.sockets.emit('publish', (connectionList[socket.id].username + ': ' + message.msg));
 			}
 		});
 
 		socket.emit('publish', 'Welcome, your id is: ' + socket.id);
 
-		socket.on('publish', function (data) {
-			console.log("ID: %s; Sent: %s", socket.id, data);
-			// for (var socketID in connectionList){
-			// 	if(socketID != socket.id){
-			// 		connectionList[socketID].emit('publish', data);
-			// 	}
-			// }
-
-			if(data.startsWith("/")){
-				data = data.slice(1);
-				var args = data.split(':');
-				var command = args[0];
-					
-				if(command == 'list'){
-					response = 'The user list is as follows:<br>';
-					for(var socketID in connectionList){
-						if(socketID != socket.id){
-							// if(connectionList)
-							response += (socketID + ': ' + connectionList[socketID].username + '<br>');
-						}
-					}
-					socket.emit('publish', response);
-				}else if(command == 'pvt'){
-					var user = args[1];
-					var msg = args[2];
-				 	if(connectionList[user] == undefined){z
-						socket.emit('publish', 'Specified user does not exist');
-					}else{
-						connectionList[user].socket.emit('publish', '[Private @ ' + socket.id + ']: ' + msg);
-						socket.emit('publish', '[Private - ' + user + ']: ' + msg);
-					}
-				}else{
-					socket.emit('publish', 'Invalid Command');
-				}
-			}else{
-				io.sockets.emit('publish', connectionList[socket.id].username + ': ' + data);
-			}
-		});
 		socket.on('disconnect', function(){
 			console.log("Connection closed, removing socket..");
 			delete connectionList[socket.id];
@@ -462,6 +456,7 @@ var initializeServer = function() {
 process.on('SIGINT', function(){
 	console.log(' Ctrl+C Pressed. Saving changes...');
 	// Save changes here
+	db.close();
 	console.log('Exiting...')
 	process.exit(0);
 });
