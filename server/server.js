@@ -317,7 +317,7 @@ var initializeServer = function() {
 						player1Passed = true;
 					}
 					if(moveObj.c == 2){
-						player2Passed = true;
+						player2Passed = player1Passed;
 					}
 					_makeMove(0);
 					if(player1Passed && player2Passed){

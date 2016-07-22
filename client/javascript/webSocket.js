@@ -179,7 +179,7 @@ function updateGameStatus(callback){
         currPlayer = data.currentTurn;
         player1.passed = data.player1Passed;
         player1.capturedTokens = data.player1CapturedTokens;
-        player2.passed = data.player2Passed;
+        player2.passed = data.player2Passed || data.lastMove.c == 2? data.lastMove.pass: false;
         player2.capturedTokens = data.player2CapturedTokens;
         updatePlayerInfo();
         renderUnfinishedGameBoard();
