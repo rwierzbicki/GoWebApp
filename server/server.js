@@ -45,6 +45,7 @@ var db = new dbInterface(null, null);
 db.connect(function(error){
 	if(error){
 		console.log('Database connection failed');
+		process.exit(1);
 	}else{
 		console.log('Database connection established');
 		db.init(initializeServer);
