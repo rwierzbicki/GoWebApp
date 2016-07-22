@@ -240,8 +240,8 @@ function getGameDetail(gameObjectID, callback){
 	});
 }
 
-function undo(){
-	socket.emit('undo', 2);
+function undo(step){
+	socket.emit('undo', step);
 }
 
 socket.on('actionRequired', function(action){
