@@ -162,9 +162,13 @@ class DBInterface{
 		var updateObjectList = function(object, length, list, callback){
 			delete object['moveHistory'];
 			_this.getAccountInfo(ObjectID(object.player1), function(player1UserObj){
-				object.player1 = player1UserObj.username;
+				if(player1UserObj){
+					object.player1 = player1UserObj.username;
+				}
 				_this.getAccountInfo(ObjectID(object.player2), function(player2UserObj){
-					object.player2 = player2UserObj.username;
+					if(player2UserObj){
+						object.player2 = player2UserObj.username;
+					}
 					list.push(object);
 					if(list.length == length){
 						// Sort the list before sending back
