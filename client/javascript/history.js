@@ -78,7 +78,12 @@ function loadGameHistory() {
 
 function clickContinueGame(event) {
 	var gameId = event.target.getAttribute('gameId');
-	continueGame(gameId, null);
+	continueGame(gameId, null, function(gameInfo) {
+		if (gameInfo.gameMode === 0)
+			$('#undo-button').show();
+		else
+			$('#undo-button').hide();
+	});
 }
 
 function clickReplayGame(event) {
@@ -117,7 +122,7 @@ function clickReplayGame(event) {
 			updateReplayButtons();
 			$('#play-history-button').html('&#9658;');
 		}
-		$('#pass-button').hide();
+		$('#gameplay-buttons').hide();
 	});
 }
 

@@ -90,6 +90,10 @@ function updatePlayerInfo() {
 	}
 }
 
+function clickUndo() {
+	undo(1);
+}
+
 function clickPass(event) {
 	if (isLoading)
 		return;
@@ -150,7 +154,7 @@ function onClickNewToken(event) {
 		swapPlacedTokens(2, TOKEN_IMGS[player2.token]);
 	}
 
-	$('#chooseTokenModal').modal('hide');
+	$('#choose-token-modal').modal('hide');
 
 	updatePlayerTokens();
 	loadTokenSelectionModal();
@@ -158,7 +162,7 @@ function onClickNewToken(event) {
 }
 
 function renderNewGameBoard() {
-	$('#gameboard').empty();
+	$('#gameboard').remove();
 	var svg = makeGameBoard();
 	
 	// tokens
@@ -173,7 +177,7 @@ function renderNewGameBoard() {
 
 function renderUnfinishedGameBoard() {
 	var boardState = board.state;
-	$('#gameboard').empty();
+	$('#gameboard').remove();
 	var svg = makeGameBoard();
 	var unplacedToken = (currPlayer == 1 ? TOKEN_IMGS[player1.token] : TOKEN_IMGS[player2.token]);
 	
@@ -190,6 +194,12 @@ function renderUnfinishedGameBoard() {
     }
 
 	$('#gameboard-container').append(svg);
+
+	// disable undo if there are no tokens on the board
+	if ($(".placed").length > 0)
+		$('#undo-button').removeClass('disabled');
+	else
+		$('#undo-button').addClass('disabled');
 }
 
 function makeGameBoard() {

@@ -73,6 +73,11 @@ function continueGame(gameID, gameParameters, callback) {
 		board.setSize(gameInfo.boardSize);
         board.hotseat = (gameInfo.gameMode === 0);
 
+        if (board.hotseat)
+			$('#undo-button').show();
+		else
+			$('#undo-button').hide();
+
         if (primary === 1 && gameInfo.player2 === player1.username) {
 			primary = 2;
 			swapPlayerTokens();

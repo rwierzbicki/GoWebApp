@@ -20,6 +20,7 @@ window.onload = function() {
 	$('#replay-score-button').click(function() {
 		$('#score-modal').modal('show');
 	})
+	$('#undo-button').click(clickUndo);
 	$('#pass-button').click(clickPass);
 	$('#new-game-button').click(function() {
 		$('#score-modal').modal('hide');
@@ -54,7 +55,7 @@ function showNewGamePage() {
 function showGamePage() {
 	$('.page-section').hide();
 	$('#history-controls').hide();
-	$('#pass-button').show();
+	$('#gameplay-buttons').show();
 	$('#game-page').show();
 	$('#logo').show();
 	pageSwitched();
@@ -81,6 +82,10 @@ function pageSwitched() {
 function startGame() {
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
 	board.hotseat = $('input[name="play-mode-radio"]:checked').val() === "hotseat";
+	if (board.hotseat)
+		$('#undo-button').show();
+	else
+		$('#undo-button').hide();
 
 	currPlayer = 1;
 
