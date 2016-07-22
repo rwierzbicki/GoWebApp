@@ -91,9 +91,14 @@ function updatePlayerInfo() {
 }
 
 function clickPass(event) {
+	if (isLoading)
+		return;
 	makeMove(0, 0, currPlayer, true, function(result) {
 		if (result < 0) {
 			//showAlert("result = " + result);
+			if (result === -4) {
+				showAlert("Our hamsters are taking a break.", "Try again in a moment");
+			}
 			isLoading = false;
 		}
 	});
@@ -212,7 +217,7 @@ function onClickToken(event) {
 	if (token.getAttribute("class") !== "token-image unplaced")
 		return;
 	if (isLoading) {
-		showAlert("Our hamsters are taking a break", "One moment");
+		showAlert("Our hamsters are taking a break", "Try again in a moment.");
 		return;
 	}
 
