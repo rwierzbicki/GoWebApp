@@ -240,6 +240,10 @@ function getGameDetail(gameObjectID, callback){
 	});
 }
 
+function undo(){
+	socket.emit('undo', 2);
+}
+
 socket.on('actionRequired', function(action){
 	switch(action.code){
 		case 0:
@@ -272,13 +276,16 @@ socket.on('publish', function(data) {
 socket.on('connect', function(){
 	var credential = getCredentialCookie();
 	auth(credential.username, credential.password, function(isSucceed, statusNo){
+		console.log(statusNo);
 		initialize(credential.username, credential.password, isSucceed);
 	});
 });
 
 function initialize(username, password, isSucceed) {
 	if(isSucceed){
+		console.log('Inside init. function');
 		getAccountInfo(function(accountInfoObj) {
+			console.log(accountInfoObj);
 			if(accountInfoObj.currentGame){
 				// There's an unfinished game, continue automatically
 				continueGame(accountInfoObj.currentGame, null, function(gameInfo){

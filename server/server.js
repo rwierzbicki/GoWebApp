@@ -261,9 +261,11 @@ var initializeServer = function() {
 			if(unfinishedGameObjectID){
 				// Continue a specific game
 				console.log('Continue the game: ' + unfinishedGameObjectID);
-				resumeData(unfinishedGameObjectID, true, function(gameObject){
-					response(gameObject);
-				});
+				db.modifyAccountInformation(userObjID, {currentGame : unfinishedGameObjectID}, function(err, result){
+					resumeData(unfinishedGameObjectID, true, function(gameObject){
+						response(gameObject);
+					});
+				})
 			}else{
 				// Start a new game
 				console.log('Start a new game');
@@ -354,6 +356,14 @@ var initializeServer = function() {
 				callback(-4);
 			}
 		};
+
+		socket.on('undo', function(step, response){
+			db.undo(currentGameID, step, function(moveHistoryLength){
+				resumeData(currentGameID, moveHistoryLength == 0, function(){
+					console.log('Undo request completed');
+				});
+			});
+		});
 
 		socket.on('makeMove', function(moveObj, response){
 			console.log('Handling move: ' + JSON.stringify(moveObj));

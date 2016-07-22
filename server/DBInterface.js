@@ -137,16 +137,17 @@ class DBInterface{
 						};
 						_this.modifyAccountInformation(dstID, modificationObject, function(modifyErr, result){
 							assert.equal(modifyErr, null);
-							callback(true);
+							// Update the temporary ObjectIDs in the relevant game history
+							var gameCollection = _this._db.collection('gamecollection');
+							gameCollection.update({'player1' : srcObj._id}, {$set: {'player1' : dstObj._id}}, function(err, result){
+								assert.equal(err, null);
+								gameCollection.update({'player2' : srcObj._id}, {$set: {'player2' : dstObj._id}}, function(err, result){
+									assert.equal(err, null);
+									callback(true);
+								});
+							});						
 						});
-						// Update the temporary ObjectIDs in the relevant game history
-						var gameCollection = _this._db.collection('gamecollection');
-						gameCollection.update({'player1' : srcObj}, {$set: {'player1' : dstObj}}, function(err, result){
-							assert.equal(err, null);
-						});
-						gameCollection.update({'player2' : srcObj}, {$set: {'player2' : dstObj}}, function(err, result){
-							assert.equal(err, null);
-						});
+
 					}
 				});
 			});
@@ -286,6 +287,25 @@ class DBInterface{
 					function(gameUpdateErr, result){
 						assert.equal(gameUpdateErr, null);
 						callback();
+				});
+			});
+		});
+	}
+
+	undo(gameObjectID, step, callback){
+		var _this = this;
+		this.connect(function(){
+			var gameCollection = _this._db.collection('gamecollection');
+			assert.equal(step >= 0, true);
+			console.log(gameObjectID);
+
+			gameCollection.findOne({_id : gameObjectID}, function(findErr, gameObject){
+				var moveHistory = gameObject.moveHistory;
+				moveHistory = moveHistory.slice(0, -step);
+				gameCollection.updateOne({_id : gameObjectID}, {$set: {moveHistory : moveHistory}}, 
+					function(gameUpdateErr, result){
+						assert.equal(gameUpdateErr, null);
+						callback(moveHistory.length);
 				});
 			});
 		});
