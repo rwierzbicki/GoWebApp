@@ -352,8 +352,8 @@ function calculateScore(board, capturedTokens1, capturedTokens2) {
 		handicap = 7.5;
 	}
 
-	score[0] = token_Num_Black + capturedTokens1 + count[0];
-	score[1] = token_Num_White + capturedTokens2 + count[1] + handicap;
+	score[0] = {totalScore : token_Num_Black + capturedTokens1 + count[0], armyTokens: token_Num_Black, capturedTokens : capturedTokens1, territory : count[0], handicap : 0};
+	score[1] = {totalScore : token_Num_White + capturedTokens2 + count[1] + handicap, armyTokens : token_Num_White, capturedTokens : capturedTokens2, territory : count[1], handicap : handicap};
 	
 
 	return score;

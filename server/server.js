@@ -66,12 +66,12 @@ var initializeServer = function() {
 		var currentGameID = null;
 
 		var prevBoard = null;
-		var currBoard = null; // 0: Local 1: AI (2: On-line)
+		var currBoard = null;
 		var tempBoard = null;
 		var lastMove = null;
 		var player1Passed = false;
 		var player2Passed = false;
-		var gameMode = null;
+		var gameMode = null; // 0: Local 1: AI (2: On-line)
 		var accountHolderTokenType = null;
 		var currentTurn = null;
 		var player1CapturedTokens = 0;
@@ -417,6 +417,10 @@ var initializeServer = function() {
 			console.log(currBoard);
 			console.log('============');
 			response(updateResponse);
+		});
+
+		socket.on('getAvailableMatchList', function(data, response){
+
 		});
 
 		socket.on('control', function(message, response){

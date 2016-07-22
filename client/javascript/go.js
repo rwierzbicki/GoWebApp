@@ -274,7 +274,7 @@ function onFinishedGame(score1, score2) {
 		str += "</strong>, you won!"
 		$('#finished-game-text').html(str);
 	} else {
-		if (score1 > score2) 
+		if (score1.totalScore > score2.totalScore) 
 			$('#finished-game-text').html("Nice going, you won!");
 		else
 			$('#finished-game-text').html("There will be a time when we are all bested by robots. It's starting.");
@@ -282,10 +282,10 @@ function onFinishedGame(score1, score2) {
 	
 
 	$('#finish-p1-name').html(names.player1);
-    $('#finish-p1-score').html(score1);
+    $('#finish-p1-score').html(JSON.stringify(score1));
 
 	$('#finish-p2-name').html(names.player2);
-    $('#finish-p2-score').html(score2);
+    $('#finish-p2-score').html(JSON.stringify(score2));
 
     $('#game-finished-modal').modal('show');
 }
