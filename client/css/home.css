@@ -2,6 +2,14 @@
 	display: none;
 }
 
+#alert {
+  width: 300px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  margin: -100px 0 0 -150px;
+}
+
 .curr-player{
   background-color: LightCyan;
 }
@@ -23,8 +31,8 @@
 }
 
 .player-token {
-  height: 50px;
-  width: 50px;
+  height: 60px;
+  width: 60px;
 }
 
 .choose-token-image {
@@ -41,6 +49,19 @@
   filter: brightness(40%);
 }
 
+.winner-icon {
+  height: 20px;
+}
+
+.center-contents-horizontal {
+  text-align: center;
+}
+
+.table > tbody > tr > td.center-cell-contents  {
+  vertical-align: middle;
+  text-align: center;
+}
+
 /* need this to make the gameboard dynamic */
 #gameboard-container::before {
 	content:"";
@@ -54,4 +75,11 @@
  	right: 0;
  	left: 0;
  	bottom: 0;
+}
+
+#music-control-panel {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 15%;
 }

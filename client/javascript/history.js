@@ -1,64 +1,67 @@
 var history = {
 	list: [],
-	currHistoryIndex: 0
+	currHistoryIndex: 0,
+	intervalID : null
 }
 
-var replay = false;
+var replay;
 
 
 function loadGameHistory() {
-	// TODO: get game history data from server
-	var data = [
-		{
-			gameId: 1,
-			date: 437298759875,
-			player1: "mystigan",
-			player2: "tigger342",
-			finished: false
-		},
-		{
-			gameId: 2,
-			date: 437298759875,
-			player1: "tigger342",
-			player2: "mystigan",
-			finished: false
-		},
-		{
-			gameId: 3,
-			date: 51235750293,
-			player1: "mystigan",
-			player2: null,
-			finished: true,
-			winner: 1
-		}
-	];
-
-	callback(data);
-
-	function callback(data) {
+	getGameHistory(function callback(data) {
+		$('#game-history-table').empty();
 		var table = document.getElementById('game-history-table');
-		for (var i = 0; i < data.length; i++) {
+		for (var i = data.length-1; i >= 0; i--) {
+
+			var names = {
+				player1: null,
+				player2: null
+			};
+
+			console.log(data[i].player1);
+			console.log(data[i].player2);
+			console.log(Object.keys(data[i]));
+
+			if (data[i].player1 === "anonymous")
+				names.player1 = "Player 1";
+			else
+				names.player1 = data[i].player1;
+
+			if (data[i].gameMode === 1)
+				names.player2 = "CPU";
+			else if (data[i].player2 === "anonymous")
+				names.player2 = "Player 2";
+			else
+				names.player2 = data[i].player2;
+
+			var winnerImg = "<img src='assets/icon_crown.svg' class='winner-icon'></img>   "
+
+			// Table
+
 			var row = table.insertRow(-1);	// insert row at end
 
-			// Date
+			// Cell: Date
 			var cell = row.insertCell();
-			cell.innerHTML = (new Date(data[i].date)).toDateString();
+			cell.innerHTML = formatDate(new Date(data[i].date));
 
-			// Player 1
+			// Cell: Player 1
 			cell = row.insertCell();
-			cell.innerHTML = data[i].player1;
-
-			// Player 2
-			cell = row.insertCell();
-			if (data[i].player2)
-				cell.innerHTML = data[i].player2;
+			if (data[i].finished && (data[i].score1 > data[i].score2))
+				cell.innerHTML = winnerImg + names.player1;
 			else
-				cell.innerHTML = "CPU";
+				cell.innerHTML = names.player1;
 
-			// Replay or continue
+			// Cell: Player 2
+			cell = row.insertCell();
+			if (data[i].finished && (data[i].score2 > data[i].score1))
+				cell.innerHTML = winnerImg + names.player2;
+			else
+				cell.innerHTML = names.player2;
+
+			// Cell: Replay or continue
 			cell = row.insertCell();
 			var button = document.createElement('button');
-			button.setAttribute('gameId', data[i].gameId);
+			button.setAttribute('gameId', data[i]._id);
 			button.className = "btn btn-primary";
 			if (data[i].finished) {
 				button.innerHTML = "Replay";
@@ -67,177 +70,121 @@ function loadGameHistory() {
 				button.innerHTML = "Continue";
 				button.onclick = clickContinueGame;
 			}
+			cell.className = "center-horizontal";
 			cell.appendChild(button);
 		}
-	}	
+	});	
 }
 
 function clickContinueGame(event) {
 	var gameId = event.target.getAttribute('gameId');
-
-	// TODO get game data from server using gameId
-	if (gameId == 1)
-		var data = {
-			player1: "mystigan",
-			player2: "tigger342",
-			boardSize: 9,
-			currPlayer: 2,
-			boardState: {
-				board: [ [0, 0, 1], [4, 2, 2], [6, 7, 1] ],
-				capturedTokens1: 18,
-				capturedTokens2: 4,
-				playerPassed1: false,
-				playerPassed2: false
-			}
-		};
-	else
-		var data = {
-			player1: "tigger342",
-			player2: "mystigan",
-			boardSize: 9,
-			currPlayer: 2,
-			boardState: {
-				board: [ [0, 0, 1], [4, 2, 2], [6, 7, 1] ],
-				capturedTokens1: 18,
-				capturedTokens2: 4,
-				playerPassed1: false,
-				playerPassed2: false
-			}
-		};
-
-	callback(data);
-
-	function callback(data) {
-		board.setSize(data.boardSize);
-		if (data.player2)
-			board.hotseat = true;
-		else
-			board.hotseat = false
-		currPlayer = data.currPlayer;
-		board.state = boardListToArray(data.boardSize, data.boardState.board);
-
-		if (primary === 1 && data.player2 === player1.username) {
-			primary = 2;
-			player2.token = player1.token;
-			player1.token = getOtherToken(player2.token);
-		} else if (primary === 2 && data.player1 === player2.username) {
-			primary = 1;
-			player1.token = player2.token;
-			player2.token = getOtherToken(player2.token);
-		}
-
-		player1.username = data.player1;
-		player1.capturedTokens = data.boardState.capturedTokens1;
-		player1.passed = data.boardState.playerPassed1;
-		player2.username = data.player2;
-		player2.capturedTokens = data.boardState.capturedTokens1;
-		player2.passed = data.boardState.playerPassed1;
-
-		renderUnfinishedGameBoard();
-		updatePlayerInfo();
-		showGamePage();
-	}
+	continueGame(gameId, null);
 }
 
 function clickReplayGame(event) {
 	var gameId = event.target.getAttribute('gameId');
 
-	// TODO get game data from server using gameId
-	var data = {
-		player1: "mystigan",
-		player2: "tigger342",
-		boardSize: 9,
-		history: [
-			{
-				board: [ ],
-				capturedTokens1: 0,
-				capturedTokens2: 0,
-				playerPassed1: false,
-				playerPassed2: false
-			},
-			{
-				board: [ [3, 8, 1] ],
-				capturedTokens1: 3,
-				capturedTokens2: 0,
-				playerPassed1: false,
-				playerPassed2: false
-			},
-			{
-				board: [ [2, 3, 2], [3, 8, 1] ],
-				capturedTokens1: 9,
-				capturedTokens2: 2,
-				playerPassed1: false,
-				playerPassed2: false
-			},
-			{
-				board: [ [5, 1, 1 ], [2, 3, 2], [3, 8, 1] ],
-				capturedTokens1: 9,
-				capturedTokens2: 2,
-				playerPassed1: true,
-				playerPassed2: false
-			},
-			{
-				board: [ [5, 1, 1 ], [2, 3, 2], [6, 5, 2], [3, 8, 1] ],
-				capturedTokens1: 14,
-				capturedTokens2: 2,
-				playerPassed1: true,
-				playerPassed2: true
-			}
-		]
-	};
-
-	callback(data);
-
-	function callback(data) {
+	getGameDetail(gameId, function callback(data) {
 		board.setSize(data.boardSize);
-		if (data.player2)
-			board.hotseat = true;
-		else
-			board.hotseat = false
-		history.list = data.history;
-		history.currHistoryIndex = data.history.length-1;
-		if (data.history.length > 1)
-			$('#prev-board-button').show();
+		board.hotseat = (data.gameMode === 0);
+
+		history.list = data.moveHistory;
+		history.currHistoryIndex = 0;
+		history.playStarted = false;
 
 		if (primary === 1 && data.player2 === player1.username) {
-			player2.token = player1.token;
-			player1.token = getOtherToken(player2.token);
+			swapPlayerTokens();
 		} else if (primary === 2 && data.player1 === player2.username) {
-			player1.token = player2.token;
-			player2.token = getOtherToken(player2.token);
+			swapPlayerTokens();
 		}
 
 		player1.username = data.player1;
 		player2.username = data.player2;
 
+		$('#finished-game-buttons').hide();
+		$('#score-text').html("");
+		populateScoreTable(data.score1, data.score2);
+
 		renderHistoryGameBoard();
 		updateHistoryInfo();
 		showGamePage();
 
-		// has to be after showGamePage() since that method hides it
-		$('#history-controls').show();
-
-		// has to be after showGamePage() since that method sets it to false
+		// has to be after showGamePage()
 		replay = true;
-	}
+		$('#score-modal').modal('show');
+		if (data.moveHistory.length > 1){
+			$('#history-controls').show();
+			updateReplayButtons();
+			$('#play-history-button').html('&#9658;');
+		}
+		$('#pass-button').hide();
+	});
 }
 
 function clickPrevBoard(event) {
-	$('#next-board-button').show();
-	history.currHistoryIndex -= 1;
 	if (history.currHistoryIndex === 0)
-		$('#prev-board-button').hide();
+		return;
+	history.currHistoryIndex -= 1;
+	clearInterval(history.intervalID);
+	$('#play-history-button').html('&#9658;');
 	renderHistoryGameBoard();
+	updateReplayButtons();
 	updateHistoryInfo();
 }
 
-function clickNextBoard(event) {
-	$('#prev-board-button').show();
-	history.currHistoryIndex += 1;
+function clickPlayBoard(event) {
+	if(!history.intervalID){
+		history.intervalID = setInterval(function(){
+			if($('#play-history-button').css('display') == 'none'){
+				clearInterval(history.intervalID);
+				history.intervalID = null;
+				return;
+			}
+			if(history.currHistoryIndex == history.list.length - 1){
+				clearInterval(history.intervalID);
+				history.intervalID = null;
+				$('#play-history-button').html('&#65517;');
+			}else{
+				clickNextBoard(null, true);
+			}
+		}, 1000);
+		history.playStarted = true;
+		$('#play-history-button').html('&#8214;');
+	}else{
+		clearInterval(history.intervalID);
+		history.intervalID = null;
+		$('#play-history-button').html('&#9658;');
+	}
+
+}
+
+function clickNextBoard(event, isAuto) {
 	if (history.currHistoryIndex === history.list.length-1)
-		$('#next-board-button').hide();
+		return;
+	history.currHistoryIndex += 1;
+	if (history.currHistoryIndex === history.list.length-1){
+		$('#play-history-button').html('&#65517;');
+	}
+	if(!isAuto){
+		clearInterval(history.intervalID);
+		history.intervalID = null;
+		$('#play-history-button').html('&#9658;');
+	}
 	renderHistoryGameBoard();
+	updateReplayButtons();
 	updateHistoryInfo();
+}
+
+function updateReplayButtons() {
+	if (history.currHistoryIndex > 0)
+		$('#prev-board-button').removeClass("disabled");
+	else
+		$('#prev-board-button').addClass("disabled");
+
+	if (history.currHistoryIndex < history.list.length-1)
+		$('#next-board-button').removeClass("disabled");
+	else
+		$('#next-board-button').addClass("disabled");
 }
 
 function renderHistoryGameBoard() {
@@ -263,10 +210,21 @@ function updateHistoryInfo() {
 	var state = history.list[history.currHistoryIndex];
 
 	player1.capturedTokens = state.capturedTokens1;
-	player1.passed = state.playerPassed1;
+	player1.passed = state.player1Passed;
 	player2.capturedTokens = state.capturedTokens2;
-	player2.passed = state.playerPassed2;
+	player2.passed = state.player2Passed;
 
 	updatePlayerInfo();
 	$('#board-page-number').html((history.currHistoryIndex+1) + "/" + history.list.length);
 }
+
+/*
+ * @param date: Date object
+ * @return date in format h:s:ms
+*/
+function formatDate(date) {
+	return months[date.getMonth()] + " " + date.getDate() + "    " + (date.getHours()<10 ? "0" : "") + 
+			date.getHours() + ":" + (date.getMinutes()<10 ? "0" : "") + date.getMinutes();
+}
+
+var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

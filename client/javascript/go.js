@@ -39,35 +39,26 @@ var board = {
 var currPlayer;
 var playerNewToken; // which player is changing their token
 
-/**
- * Loads each player's name, token, captured tokens, and passed state onto
- * the screen as well as highlighting the current player
- */
-function updatePlayerInfo() {
+var isLoading = false;
 
-	// USERNAME
+// Load each players' names onto game page
+function updatePlayerNames() {
+	var names = getScreenNames();
+	document.getElementById('p1-name').innerHTML = names.player1;
+	document.getElementById('p2-name').innerHTML = names.player2;
+}
 
-	// if player 1 signed in, use username else "Player 1"
-	if (player1.username)
-		document.getElementById('p1-name').innerHTML = player1.username;
-	else
-		document.getElementById('p1-name').innerHTML = "Player 1";	
-
-	// if player 2 signed in, use username else if
-	// hotseat, "Player 2", if not hotseat, "CPU"
-	if (player2.username)
-		document.getElementById('p2-name').innerHTML = player2.username;
-	else {
-		if (board.hotseat)
-			document.getElementById('p2-name').innerHTML = "Player 2";
-		else
-			document.getElementById('p2-name').innerHTML = "CPU";
-	}
-
-	// TOKEN
-	
+// Load players' tokens onto game page
+function updatePlayerTokens() {
 	document.getElementById('p1-token').src = TOKEN_IMGS[player1.token];
 	document.getElementById('p2-token').src = TOKEN_IMGS[player2.token];
+}
+
+/**
+ * Load each player's captured tokens, and passed state onto
+ * game page as well as highlighting the current player
+ */
+function updatePlayerInfo() {
 
 	// CAPTURED TOKENS
 
@@ -77,15 +68,15 @@ function updatePlayerInfo() {
 	// PASSED
 
 	if (player1.passed) {
-		$('#p1-pass-button').addClass("active");
+		$('#p1-passed').css('visibility','visible');
 	} else {
-		$('#p1-pass-button').removeClass("active");
+		$('#p1-passed').css('visibility','hidden');
 	}
 
 	if (player2.passed) {
-		$('#p2-pass-button').addClass("active");
+		$('#p2-passed').css('visibility','visible');
 	} else {
-		$('#p2-pass-button').removeClass("active");
+		$('#p2-passed').css('visibility','hidden');
 	}
 	
 	// HIGHLIGHT CURRENT PLAYER
@@ -100,36 +91,29 @@ function updatePlayerInfo() {
 }
 
 function clickPass(event) {
-	if (replay)
+	if (isLoading)
 		return;
-
-	if (currPlayer === 1 && event.target.id === "p1-pass-button") {	// if player 1 passed
-		player1.passed = true;
-		currPlayer = 2;
-	} else if (currPlayer === 2 && event.target.id === "p2-pass-button") {
-		if (player1.passed) {
-			player2.passed = true;
-			alert("This game is finished");	// TODO end game!
-		} else {
-			currPlayer = 1;
+	makeMove(0, 0, currPlayer, true, function(result) {
+		if (result < 0) {
+			//showAlert("result = " + result);
+			if (result === -4) {
+				showAlert("Our hamsters are taking a break.", "Try again in a moment");
+			}
+			isLoading = false;
 		}
-	} else {
-		alert("You can only pass on your turn!");
-	}
-
-	updatePlayerInfo();
-	updateUnplacedTokens();
+	});
 }
 
 // load tokens into Token Selection Modal
 function loadTokenSelectionModal() {
 	var modalBody = document.getElementById('choose-token-body');
 	modalBody.innerHTML = "";
+
 	for (var key in TOKEN_IMGS) {
 		var a = document.createElement('a');
 		var img = document.createElement('img');
 		img.src = TOKEN_IMGS[key];
-		img.id = key;
+		img.setAttribute("token", key);
 		a.onclick = onClickNewToken;
 
 		// token is already being used
@@ -155,24 +139,22 @@ function onClickNewToken(event) {
 	}
 
 	if (playerNewToken === 1) {
-		document.getElementById(player1.token).className = "choose-token-image";
-		player1.token = event.target.id;
-		document.getElementById(player1.token).className = "choose-token-image taken";
-		document.getElementById("p1-token").src = TOKEN_IMGS[player1.token];
+		player1.token = event.target.getAttribute("token");
 		if (playerNewToken === currPlayer)
 			updateUnplacedTokens();
 		swapPlacedTokens(1, TOKEN_IMGS[player1.token]);
 	} else {
-		document.getElementById(player2.token).className = "choose-token-image";
-		player2.token = event.target.id;
-		document.getElementById(player2.token).className = "choose-token-image taken";
-		document.getElementById("p2-token").src = TOKEN_IMGS[player2.token];
+		player2.token = event.target.getAttribute("token");
 		if (playerNewToken === currPlayer)
 			updateUnplacedTokens();
 		swapPlacedTokens(2, TOKEN_IMGS[player2.token]);
 	}
 
 	$('#chooseTokenModal').modal('hide');
+
+	updatePlayerTokens();
+	loadTokenSelectionModal();
+	changeTokenImgs([player1.token, player2.token]);	// save tokens to server
 }
 
 function renderNewGameBoard() {
@@ -231,18 +213,27 @@ function makeGameBoard() {
 
 function onClickToken(event) {
 	var token = event.target;
+
 	if (token.getAttribute("class") !== "token-image unplaced")
 		return;
-
-	token.setAttribute("class", "token-image placed " + currPlayer);
-	
-	if (board.hotseat) {
-		currPlayer = (currPlayer === 1 ? 2 : 1);
+	if (isLoading) {
+		showAlert("Our hamsters are taking a break", "Try again in a moment.");
+		return;
 	}
 
-	player1.passed = false;
-	updatePlayerInfo();
-	updateUnplacedTokens();
+	isLoading = true;
+
+	makeMove(parseInt(token.getAttribute("X")), parseInt(token.getAttribute("Y")), currPlayer, false, function(result) {
+		switch(result) {
+			case -2:
+				showAlert("That move would recreate the past board state!", "Ko Move");
+				isLoading = false;
+				break;
+			case -3:
+				showAlert("That move would cause your army to be immediately captured!", "Suicide");
+				isLoading = false;
+		}
+	});
 	
 }
 
@@ -264,6 +255,65 @@ function updateUnplacedTokens() {
 	for (var i = 0; i < unplacedTokens.length; i++)
 		unplacedTokens[i].setAttributeNS('http://www.w3.org/1999/xlink','href', imgPath);
 }
+
+function onFinishedGame(score1, score2) {
+	$('#finished-game-buttons').show();
+
+	var names = getScreenNames();
+
+	if (board.hotseat) {
+		var str = "Congratulations <strong>"
+		if (score1.totalScore > score2.totalScore)
+			str += names.player1;
+		else
+			str += names.player2;
+		str += "</strong>, you won!"
+		$('#score-text').html(str);
+	} else {
+		if (score1.totalScore > score2.totalScore) 
+			$('#score-text').html("Nice going, you won!");
+		else
+			$('#score-text').html("There will be a time when we are all bested by robots. It's starting.");
+	}
+
+	populateScoreTable(score1, score2);
+
+    $('#score-modal').modal('show');
+}
+
+function populateScoreTable(score1, score2) {
+	var names = getScreenNames();
+
+	var winnerImg = "<img src='assets/icon_crown.svg' class='winner-icon'></img>   "
+
+	if (score1.totalScore > score2.totalScore)
+		$('#score-p1-name').html(winnerImg + names.player1);
+	else
+		$('#score-p1-name').html(names.player1);
+
+	$('#score-p1-captured').html(score1.capturedTokens);
+	$('#score-p1-armies').html(score1.armyTokens);
+	$('#score-p1-territory').html(score1.territory);
+	$('#score-p1-handicap').html(score1.handicap);
+    $('#score-p1-total').html(score1.totalScore);
+
+	if (score2.totalScore > score1.totalScore)
+		$('#score-p2-name').html(winnerImg + names.player2);
+	else
+		$('#score-p2-name').html(names.player2);
+
+	$('#score-p2-captured').html(score2.capturedTokens);
+	$('#score-p2-armies').html(score2.armyTokens);
+	$('#score-p2-territory').html(score2.territory);
+	$('#score-p2-handicap').html(score2.handicap);
+    $('#score-p2-total').html(score2.totalScore);
+}
+
+function onScoreModalClosed() {
+	if (!replay)
+    	showHomePage();
+}
+
 
 /**
  * Converts board from list to 2D array
@@ -288,13 +338,28 @@ function boardListToArray(size, boardList) {
 	return boardArr;
 }
 
-/**
- * Returns a token image which is not already taken
- * (more specifically, the next available token)
- *
- * @param token {key in TOKEN_IMGS} token which is already taken
- */
-function getOtherToken(token) {
-	keys = Object.keys(TOKEN_IMGS);
-	return keys[(keys.indexOf(token)+1)%keys.length];
+function swapPlayerTokens() {
+	var temp = player1.token;
+	player1.token = player2.token;
+	player2.token = temp;
+}
+
+function getScreenNames() {
+	var p1;
+	var p2;
+
+	if (player1.username.substring(0,5) === "temp_" || player1.username === "anonymous")
+        p1 = "Player 1";
+    else
+        p1 = player1.username;
+
+    if (!board.hotseat)
+        p2 = "CPU";
+    else if (player2.username === "anonymous")
+        p2 = "Player 2";
+    else
+        p2 = player1.username;
+
+
+	return { player1: p1, player2: p2 };
 }

@@ -1,4 +1,5 @@
 var userSigningIn; //which player is signing in
+var onGamePage = false;
 
 window.onload = function() {
 	// Event Listeners
@@ -12,15 +13,27 @@ window.onload = function() {
 	$('#game-history-button').click(showHistoryPage);
 	$('#logout-button').click(logout);
 	$('#choose-token-modal').on('show.bs.modal', onTokenModalOpened);
+	$('#score-modal').on('hide.bs.modal', onScoreModalClosed);
 	$('#prev-board-button').click(clickPrevBoard);
+	$('#play-history-button').click(clickPlayBoard);
 	$('#next-board-button').click(clickNextBoard);
-	$('#p1-pass-button').click(clickPass);
-	$('#p2-pass-button').click(clickPass);
+	$('#replay-score-button').click(function() {
+		$('#score-modal').modal('show');
+	})
+	$('#pass-button').click(clickPass);
+	$('#new-game-button').click(function() {
+		$('#score-modal').modal('hide');
+		showNewGamePage();
+	})
+	$('#view-history-button').click(function() {
+		$('#score-modal').modal('hide');
+		showHistoryPage();
+	})
 
 	$('#username-button').parent().hide();	// not sure why giving it the class 'initially-hidden' does not work...
 
 	loadTokenSelectionModal();
-	loadGameHistory();
+	backgroundMusicInit();
 }
 
 function showHomePage() {
@@ -41,13 +54,17 @@ function showNewGamePage() {
 function showGamePage() {
 	$('.page-section').hide();
 	$('#history-controls').hide();
+	$('#pass-button').show();
 	$('#game-page').show();
 	$('#logo').show();
 	pageSwitched();
 	replay = false;
+	onGamePage = true;
+	updatePlayerNames();
 }
 
 function showHistoryPage() {
+	loadGameHistory();
 	$('.page-section').hide();
 	$('#history-page').show();
 	$('#logo').show();
@@ -56,44 +73,54 @@ function showHistoryPage() {
 
 // gets called whenever pages are switched
 function pageSwitched() {
+	onGamePage = false;
 	$('#alert').hide();
 }
 
 
 function startGame() {
 	board.setSize(parseInt($('input[name="board-size-radio"]:checked').val()));
+	board.hotseat = $('input[name="play-mode-radio"]:checked').val() === "hotseat";
+
 	currPlayer = 1;
 
 	if (primary === 2) {
-		var temp = player1;
-		player1 = player2;
-		player2 = temp
 		primary = 1
+		swapPlayerTokens();
 	}  
 
-	renderNewGameBoard();
-	updatePlayerInfo();
-	showGamePage();
+	onNewGameButtonClick(board.size, (board.hotseat ? 0 : 1), 1, function(data) {
+        board.state = data.board;
+        currPlayer = data.currentTurn;
+        console.log("board.state = " + board.state);
+        console.log("currPlayer = " + currPlayer);
+        updatePlayerInfo();
+        renderUnfinishedGameBoard();
+        showGamePage();
+    });
+
 }
 
 function submitLogin() {
 	var form = document.getElementById("login-form").elements;
-	
-	if (form["username"].value.substring(0, 5) === "_temp") {
-		alert("Please choose a username which does not start with '_temp'");
+	var username = form["username"].value;
+	var password = form["password"].value;
+
+	if (username.substring(0, 5) === "temp_") {
+		showAlert("Please choose a username which does not start with 'temp_'");
 		return;
 	}
 
 	auth(username, password, function(saveCredentialToCookie, result) {
 		switch(result) {
 			case -1:
-				alert("You're already logged in!");
+				showAlert("You're already logged in!");
 				break;
 			case 0:
-				alert("Check your password", "Oops...");
+				showAlert("Check your password", "Oops...");
 				break;
+			case 3: showAlert("New account created", "Welcome!");
 			case 1:
-			case 3:
 			case 4:
 				if (userSigningIn == 1) {
 					player1.username = username;
@@ -109,14 +136,11 @@ function login() {
 	$('#login-button').parent().hide();
 	$('#username-button').html(player1.username + '<b class="caret"></b>');
 	$('#username-button').parent().show();
-	updatePlayerInfo();
 }
 
 function logout() {
-	player1.username = undefined;
-	$('#username-button').parent().parent().hide();
-	$('#login-button').parent().parent().show();
-	showHomePage();
+	delCredentialCookie();
+	location.reload();
 }
 
 /**
@@ -124,9 +148,9 @@ function logout() {
  * @param text {string} alert message
  * @param header {string} optional, bolded text before message
  */
-function alert(text, header) {
+function showAlert(text, header) {
 	var div = document.createElement("div");
-	div.className = "alert alert-warning alert-dismissible fade in";
+	div.className = "alert alert-success alert-dismissible fade in";
 	div.setAttribute("role", "alert");
 
 	var closeBtn = document.createElement("button");
@@ -144,7 +168,7 @@ function alert(text, header) {
 
 	if (header) {
 		var heading = document.createElement("strong");
-		heading.innerHTML = header;
+		heading.innerHTML = header + " ";
 
 		div.appendChild(heading);
 	}

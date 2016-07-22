@@ -36,7 +36,7 @@
 		            	<li class="nav-link"><a href="#game-rules-modal" data-toggle="modal">Game Rules</a></li>
 		            	<li class="nav-link"><a href="#login-modal" id="login-button" class="login-button" data-toggle="modal">Login</a></li>
 	            		<li class="dropdown">
-	            			<a href="#" id="username-button" class="dropdown-toggle" data-toggle="dropdown">User</a>
+	            			<a href="#" id="username-button" class="dropdown-toggle" data-toggle="dropdown"></a>
 	            			<ul class="dropdown-menu">
 	            				<li><a href="#" id="game-history-button">Game History</a></li>
 	            				<li><a href="#" id="logout-button">Logout</a></li>
@@ -46,8 +46,6 @@
 		  		</div>
 		  	</nav>
 	  	</div>
-
-	  	<div id="alert" class="container initially-hidden"></div>
 
 	  	<!--============================== LOGIN MODAL ================================-->
 
@@ -131,27 +129,117 @@
             	<div id="gameboard-container" class="col-md-8"></div>
             	<div class="col-md-4">
             		<table class="table">
-	            		<tr id="player-1"><td>
-	            			<h4 id="p1-name"></h4>
-	            			<a href="#choose-token-modal" data-toggle="modal"><img id="p1-token" class="player-token"/></a>
-	            			<br>Captured Tokens: <span id="p1-captured-tokens"></span>
-	            			<button id="p1-pass-button" class="btn btn-default">Pass</button>
-	            		</td></tr>
-	            		<tr id="player-2"><td>
-	            			<h4 id="p2-name"></h4>
-	            			<a href="#choose-token-modal" data-toggle="modal"><img id="p2-token" class="player-token"/></a>
-	            			<br>Captured Tokens: <span id="p2-captured-tokens"></span></h4>
-	            			<button id="p2-pass-button" class="btn btn-default">Pass</button>
-	            		</td></tr>
-	            		<tr><td id="history-controls">
-	            			<button id="prev-board-button" class="btn btn-default initially-hidden">Previous</button>
-	            			<button id="next-board-button" class="btn btn-default initially-hidden">Next</button>
-	            			<div id="board-page-number"></div>
-	            		</td></tr>
+	            		<tr id="player-1">
+	            			<td  class="center-cell-contents">
+		            			<a href="#choose-token-modal" class="player-token" data-toggle="modal"><img id="p1-token" class="player-token"/></a>
+		            		</td>
+		            		<td>
+		            			<h4 id="p1-name"></h4>
+		            			Captured Tokens: <span id="p1-captured-tokens"></span>
+		            			<div id="p1-passed"><strong>Passed</strong></div>
+	            			</td>
+	            		</tr>
+	            		<tr id="player-2">
+	            			<td class="center-cell-contents">
+		            			<a href="#choose-token-modal" data-toggle="modal"><img id="p2-token" class="player-token"/></a>
+		            		</td>
+		            		<td>
+		            			<h4 id="p2-name"></h4>
+		            			Captured Tokens: <span id="p2-captured-tokens"></span>
+		            			<div id="p2-passed" class=""><strong>Passed</strong></div>
+	            			</td>
+	            		</tr>
 	            	</table>
+	            	<div class="center-contents-horizontal"><button id="pass-button" class="btn btn-default centerBlock">Pass</button></div>
+            		<div id="history-controls" class="center-contents-horizontal initially-hidden">
+            			<strong>View History</strong><br>
+	            		<button id="prev-board-button" class="btn btn-default"><</button>
+	            		<button id="play-history-button" class="btn btn-default">&#9658;</button>
+	            		<button id="next-board-button" class="btn btn-default">></button>
+	            		<div id="board-page-number"></div>
+	            		<br>
+	            		<button id="replay-score-button" class="btn btn-default">Scores</button>
+		            </div>
             	</div>
             </div>
 	    </div>
+
+	    <!--===================================SCORE MODAL=================================-->
+
+        <div id="score-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-md">
+
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Game Scores</h4>
+                    </div>
+                    <div class="modal-body">
+                    	<div id="score-text"></div><br>
+	                    <div class="row">
+	                    	<div class="col-md-6">
+	                    		<strong id="score-p1-name">purplewallaby</strong><br><br>
+		                    	<table class="table">
+			                        <tr>
+			                        	<td>Captured Tokens</td>
+			                            <td id="score-p1-captured"></td>
+			                        </tr>
+			                        <tr>
+			                        	<td>Armies</td>
+			                            <td id="score-p1-armies"></td>
+			                        </tr>
+			                        <tr>
+			                        	<td>Territory</td>
+			                            <td id="score-p1-territory"></td>
+			                        </tr>
+			                        <tr>
+			                        	<td>Handicap</td>
+			                            <td id="score-p1-handicap"></td>
+			                        </tr>
+			                        <tr>
+			                        	<th scope="row">Total</th>
+			                            <td><strong id="score-p1-total"></strong></td>
+			                        </tr>
+			                    </table>
+				            </div>
+				            <div class="col-md-6">
+					            <strong id="score-p2-name">Player 2</strong><br><br>
+		                    	<table class="table">
+			                        <tr>
+			                        	<td>Captured Tokens</td>
+			                            <td id="score-p2-captured"></td>
+			                        </tr>
+			                        <tr>
+			                        	<td>Armies</td>
+			                            <td id="score-p2-armies"></td>
+			                        </tr>
+			                        <tr>
+			                        	<td>Territory</td>
+			                            <td id="score-p2-territory"></td>
+			                        </tr>
+			                        <tr>
+			                        	<td>Handicap</td>
+			                            <td id="score-p2-handicap"></td>
+			                        </tr>
+			                        <tr>
+			                        	<th scope="row">Total</th>
+			                            <td><strong id="score-p2-total"></strong></td>
+			                        </tr>
+			                    </table>
+			                </div>
+			            </div>
+				        
+                        <div id="finished-game-buttons" class="center-contents-horizontal">
+                        	<button id="new-game-button" type="button" class="btn btn-default">New Game</button>
+                        	<button id="view-history-button" type="button" class="btn btn-default">View Game History</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
 
 	    <!--============================TOKEN SELECTION MODAL============================-->
 
@@ -179,7 +267,7 @@
          	<table class="table">
                 <thead>
                     <tr>
-                        <th>Date</th>
+                        <th>Date Started</th>
                         <th>Player 1</th>
                         <th>Player 2</th>
                         <th></th>
@@ -247,16 +335,29 @@
 		</div>
 
 
+	    <!--=================================BACKGROUND MUSIC============================-->
+
+		<div id='music-control-panel'>
+			<img id="playButton" src="assets/pause.png" style="width:20px;height:20px;">
+			<img id="muteButton" src="assets/volume.png" style="width:20px;height:20px;">
+			<strong id="musicTitle"></strong>
+			<input id="volumeslider" type="range" min="0" max="100" value="25" step="1">
+		</div>
+		
+	    <!--=====================================ALERT===================================-->
+
+	  	<div id="alert" class="container initially-hidden"></div>
+
 	    <!-- Bootstrap core JavaScript
 	    ================================================== -->
 	    <!-- Placed at the end of the document so the pages load faster -->
 	    <script src="js/jquery.min.js"></script>
 	    <script src="js/bootstrap.min.js"></script>
-
 	    <script src="javascript/svgFactory.js"></script>
 	    <script src="javascript/go.js"></script>
 	    <script src="javascript/history.js"></script>
 	    <script src="javascript/home.js"></script>
-
+	    <script src="javascript/backgroundMusic.js"></script>
   	</body>
+
 </html>

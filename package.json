@@ -23,6 +23,7 @@
     "bootstrap": "^3.3.6",
     "express": "^4.13.4",
     "jquery": "^2.2.4",
+    "mongodb": "^2.2.1",
     "socket.io": "latest"
   },
   "devDependencies": {
