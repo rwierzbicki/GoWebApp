@@ -303,6 +303,7 @@ function initialize(username, password, isSucceed) {
 			player2.token = player2TokenID;
 			
 			updatePlayerTokens();
+			loadTokenSelectionModal();
 
 			if (username.substring(0,5) !== "temp_") {
 				player1.username = username;

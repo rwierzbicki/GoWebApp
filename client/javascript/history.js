@@ -63,11 +63,6 @@ function clickReplayGame(event) {
 		history.list = data.moveHistory;
 		history.currHistoryIndex = 0;
 		history.playStarted = false;
-		if (data.moveHistory.length > 1){
-			$('#next-board-button').show();
-			$('#play-history-button').show();
-			$('#play-history-button').html('&#9658;');
-		}
 
 		if (primary === 1 && data.player2 === player1.username) {
 			swapPlayerTokens();
@@ -83,19 +78,23 @@ function clickReplayGame(event) {
 		showGamePage();
 
 		// has to be after showGamePage()
-		$('#history-controls').show();
+		if (data.moveHistory.length > 1){
+			$('#history-controls').show();
+			updateReplayButtons();
+			$('#play-history-button').html('&#9658;');
+		}
 		$('#pass-button').hide();
 	});
 }
 
 function clickPrevBoard(event) {
-	$('#next-board-button').show();
-	history.currHistoryIndex -= 1;
 	if (history.currHistoryIndex === 0)
-		$('#prev-board-button').hide();
+		return;
+	history.currHistoryIndex -= 1;
 	clearInterval(history.intervalID);
 	$('#play-history-button').html('&#9658;');
 	renderHistoryGameBoard();
+	updateReplayButtons();
 	updateHistoryInfo();
 }
 
@@ -126,11 +125,11 @@ function clickPlayBoard(event) {
 }
 
 function clickNextBoard(event, isAuto) {
-	$('#prev-board-button').show();
+	if (history.currHistoryIndex === history.list.length-1)
+		return;
 	history.currHistoryIndex += 1;
 	if (history.currHistoryIndex === history.list.length-1){
 		$('#play-history-button').html('&#65517;');
-		$('#next-board-button').hide();
 	}
 	if(!isAuto){
 		clearInterval(history.intervalID);
@@ -138,7 +137,20 @@ function clickNextBoard(event, isAuto) {
 		$('#play-history-button').html('&#9658;');
 	}
 	renderHistoryGameBoard();
+	updateReplayButtons();
 	updateHistoryInfo();
+}
+
+function updateReplayButtons() {
+	if (history.currHistoryIndex > 0)
+		$('#prev-board-button').removeClass("disabled");
+	else
+		$('#prev-board-button').addClass("disabled");
+
+	if (history.currHistoryIndex < history.list.length-1)
+		$('#next-board-button').removeClass("disabled");
+	else
+		$('#next-board-button').addClass("disabled");
 }
 
 function renderHistoryGameBoard() {
