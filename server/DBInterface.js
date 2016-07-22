@@ -164,10 +164,14 @@ class DBInterface{
 			_this.getAccountInfo(ObjectID(object.player1), function(player1UserObj){
 				if(player1UserObj){
 					object.player1 = player1UserObj.username;
+				}else{
+					object.player1 = 'Temporary Account';
 				}
 				_this.getAccountInfo(ObjectID(object.player2), function(player2UserObj){
 					if(player2UserObj){
 						object.player2 = player2UserObj.username;
+					}else{
+						object.player2 = 'Temporary Account';
 					}
 					list.push(object);
 					if(list.length == length){

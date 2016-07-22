@@ -87,8 +87,18 @@ var initializeServer = function() {
 		var fetchUsernameForGameObject = function(gameObject, callback){
 			// Fetch the players' usernames and put them into gameObject before sending back to client
 			db.getAccountInfo(gameObject.player1, function(player1UserObj){
-				gameObject.player1 = player1UserObj.username;
+				if(player1UserObj){
+					gameObject.player1 = player1UserObj.username;
+				}else{
+					gameObject.player1 = 'Temporary Account';
+				}
+				
 				db.getAccountInfo(gameObject.player2, function(player2UserObj){
+					if(player1UserObj){
+						gameObject.player2 = player1UserObj.username;
+					}else{
+						gameObject.player2 = 'Temporary Account';
+					}
 					gameObject.player2 = player2UserObj.username;
 					gameObject.accountHolderTokenType = accountHolderTokenType;
 					callback(gameObject);
