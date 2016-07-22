@@ -10,8 +10,7 @@ var musicList = ["assets/Love Yourself.mp3", "assets/River Flow in You.mp3", "as
 var backgroundMusicInit = function(){
 
 	audio = new Audio();
-	//var musicFileName = musicList[Math.floor(Math.random() * 1024 % musicList.length)];
-	var musicFileName = musicList[2];
+	var musicFileName = musicList[Math.floor(Math.random() * 1024 % musicList.length)];
 	audio.src = musicFileName;
 	audio.loop = true;
 	audio.play();

@@ -37,7 +37,7 @@
 		            </ul>
 		            <ul class="nav navbar-nav pull-right initially-hidden">
 	            		<li class="dropdown">
-	            			<a href="#" id="username-button" class="dropdown-toggle" data-toggle="dropdown">User</a>
+	            			<a href="#" id="username-button" class="dropdown-toggle" data-toggle="dropdown"></a>
 	            			<ul class="dropdown-menu">
 	            				<li><a href="#" id="game-history-button">Game History</a></li>
 	            				<li><a href="#" id="logout-button">Logout</a></li>
@@ -137,7 +137,7 @@
 		            		<td>
 		            			<h4 id="p1-name"></h4>
 		            			Captured Tokens: <span id="p1-captured-tokens"></span>
-		            			<div id="p1-passed">Passed</div>
+		            			<div id="p1-passed"><strong>Passed</strong></div>
 	            			</td>
 	            		</tr>
 	            		<tr id="player-2">
@@ -147,16 +147,16 @@
 		            		<td>
 		            			<h4 id="p2-name"></h4>
 		            			Captured Tokens: <span id="p2-captured-tokens"></span>
-		            			<div id="p2-passed" class="">Passed</div>
+		            			<div id="p2-passed" class=""><strong>Passed</strong></div>
 	            			</td>
 	            		</tr>
 	            	</table>
 	            	<div class="center-horizontal"><button id="pass-button" class="btn btn-default centerBlock">Pass</button></div>
-            		<div id="history-controls" class="center-horizontal">
+            		<div id="history-controls" class="center-horizontal initially-hidden">
             			<strong>View History</strong><br>
-	            		<button id="prev-board-button" class="btn btn-default initially-hidden"><</button>
-	            		<button id="play-history-button" class="btn btn-default initially-hidden">&#9658;</button>
-	            		<button id="next-board-button" class="btn btn-default initially-hidden">></button>
+	            		<button id="prev-board-button" class="btn btn-default"><</button>
+	            		<button id="play-history-button" class="btn btn-default">&#9658;</button>
+	            		<button id="next-board-button" class="btn btn-default">></button>
 	            		<div id="board-page-number"></div>
 		            </div>
             	</div>

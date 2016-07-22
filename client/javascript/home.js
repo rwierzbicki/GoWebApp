@@ -123,8 +123,6 @@ function login() {
 	$('#login-button').parent().parent().hide();
 	$('#username-button').html(player1.username + '<b class="caret"></b>');
 	$('#username-button').parent().parent().show();
-	updatePlayerInfo();
-	loadTokenSelectionModal();
 }
 
 function logout() {

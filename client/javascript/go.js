@@ -43,20 +43,9 @@ var isLoading = false;
 
 // Load each players' names onto game page
 function updatePlayerNames() {
-	// if player 1 signed in, use username else "Player 1"
-	if (player1.username === "anonymous")
-		document.getElementById('p1-name').innerHTML = "Player 1";	
-	else
-		document.getElementById('p1-name').innerHTML = player1.username;
-
-	// if player 2 signed in, use username else if
-	// hotseat, "Player 2", if not hotseat, "CPU"
-	if (!board.hotseat)
-		document.getElementById('p2-name').innerHTML = "CPU";
-	else if (!player2.username || player2.username === "anonymous")
-		document.getElementById('p2-name').innerHTML = "Player 2";
-	else
-		document.getElementById('p2-name').innerHTML = player2.username;
+	var names = getScreenNames();
+	document.getElementById('p1-name').innerHTML = names.player1;
+	document.getElementById('p2-name').innerHTML = names.player2;
 }
 
 // Load players' tokens onto game page
@@ -158,9 +147,9 @@ function onClickNewToken(event) {
 
 	$('#chooseTokenModal').modal('hide');
 
-	updatePlayerInfo();
+	updatePlayerTokens();
 	loadTokenSelectionModal();
-	changeTokenImgs([player1.token, player2.token]);
+	changeTokenImgs([player1.token, player2.token]);	// save tokens to server
 }
 
 function renderNewGameBoard() {
@@ -328,7 +317,7 @@ function getScreenNames() {
 	var p1;
 	var p2;
 
-	if (player1.username === "anonymous")
+	if (player1.username.substring(0,5) === "temp_" || player1.username === "anonymous")
         p1 = "Player 1";
     else
         p1 = player1.username;
