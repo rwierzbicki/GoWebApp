@@ -34,6 +34,7 @@ function auth(username, password, callback){
 				}
 				console.log('Username: ' + username);
 				console.log('Password: ' + password);
+				saveCredentialToCookie = true;
 				break;
 			case 3:
 				console.log('Upgraded to formal account');
