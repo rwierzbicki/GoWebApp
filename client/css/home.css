@@ -36,11 +36,6 @@
   opacity: 1;
 }
 
-.table > tbody > tr > td.center-cell-contents  {
-  vertical-align: middle;
-  text-align: center;
-}
-
 .player-token {
   height: 60px;
   width: 60px;
@@ -60,7 +55,16 @@
   filter: brightness(40%);
 }
 
-.center-horizontal {
+.winner-icon {
+  height: 20px;
+}
+
+.center-contents-horizontal {
+  text-align: center;
+}
+
+.table > tbody > tr > td.center-cell-contents  {
+  vertical-align: middle;
   text-align: center;
 }
 

@@ -186,7 +186,8 @@ function updateGameStatus(callback){
         renderUnfinishedGameBoard();
 
         isLoading = false;
-		showGamePage();
+        if (!onGamePage)
+			showGamePage();
 
 	});
 }
@@ -260,9 +261,7 @@ socket.on('actionRequired', function(action){
 		case 2:
 			// When the game is finished, following code will be executed
 			//alert('Game finished :)');
-			//onFinishedGame(score1, score2);
 			onFinishedGame(action.data.score1, action.data.score2);
-			// onFinishedGame(Math.floor((Math.random() * 100) + 1), Math.floor((Math.random() * 100) + 1));
 			break;
 		default:
 			console.log('Unsupported action');

@@ -93,7 +93,7 @@ function updatePlayerInfo() {
 function clickPass(event) {
 	makeMove(0, 0, currPlayer, true, function(result) {
 		if (result < 0) {
-			showAlert("result = " + result);
+			//showAlert("result = " + result);
 			isLoading = false;
 		}
 	});
@@ -252,35 +252,61 @@ function updateUnplacedTokens() {
 }
 
 function onFinishedGame(score1, score2) {
+	$('#finished-game-buttons').show();
+
 	var names = getScreenNames();
 
 	if (board.hotseat) {
 		var str = "Congratulations <strong>"
-		if (score1 > score2)
+		if (score1.totalScore > score2.totalScore)
 			str += names.player1;
 		else
 			str += names.player2;
 		str += "</strong>, you won!"
-		$('#finished-game-text').html(str);
+		$('#score-text').html(str);
 	} else {
 		if (score1.totalScore > score2.totalScore) 
-			$('#finished-game-text').html("Nice going, you won!");
+			$('#score-text').html("Nice going, you won!");
 		else
-			$('#finished-game-text').html("There will be a time when we are all bested by robots. It's starting.");
+			$('#score-text').html("There will be a time when we are all bested by robots. It's starting.");
 	}
-	
 
-	$('#finish-p1-name').html(names.player1);
-    $('#finish-p1-score').html(JSON.stringify(score1));
+	populateScoreTable(score1, score2);
 
-	$('#finish-p2-name').html(names.player2);
-    $('#finish-p2-score').html(JSON.stringify(score2));
-
-    $('#game-finished-modal').modal('show');
+    $('#score-modal').modal('show');
 }
 
-function onFinishedGameModalClosed() {
-    showHomePage();
+function populateScoreTable(score1, score2) {
+	var names = getScreenNames();
+
+	var winnerImg = "<img src='assets/icon_crown.svg' class='winner-icon'></img>   "
+
+	if (score1.totalScore > score2.totalScore)
+		$('#score-p1-name').html(winnerImg + names.player1);
+	else
+		$('#score-p1-name').html(names.player1);
+
+	$('#score-p1-captured').html(score1.capturedTokens);
+	$('#score-p1-armies').html(score1.armyTokens);
+	$('#score-p1-territory').html(score1.territory);
+	$('#score-p1-handicap').html(score1.handicap);
+    $('#score-p1-total').html(score1.totalScore);
+
+	if (score2.totalScore > score1.totalScore)
+		$('#score-p2-name').html(winnerImg + names.player2);
+	else
+		$('#score-p2-name').html(names.player2);
+
+	$('#score-p2-captured').html(score2.capturedTokens);
+	$('#score-p2-armies').html(score2.armyTokens);
+	$('#score-p2-territory').html(score2.territory);
+	$('#score-p2-handicap').html(score2.handicap);
+    $('#score-p2-total').html(score2.totalScore);
+}
+
+function onScoreModalClosed() {
+	if (!replay)
+    	showHomePage();
 }
 
 

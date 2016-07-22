@@ -1,4 +1,5 @@
 var userSigningIn; //which player is signing in
+var onGamePage = false;
 
 window.onload = function() {
 	// Event Listeners
@@ -12,14 +13,21 @@ window.onload = function() {
 	$('#game-history-button').click(showHistoryPage);
 	$('#logout-button').click(logout);
 	$('#chooseTokenModal').on('show.bs.modal', onTokenModalOpened);
-	$('#game-finished-modal').on('hide.bs.modal', onFinishedGameModalClosed);
+	$('#score-modal').on('hide.bs.modal', onScoreModalClosed);
 	$('#prev-board-button').click(clickPrevBoard);
 	$('#play-history-button').click(clickPlayBoard);
 	$('#next-board-button').click(clickNextBoard);
+	$('#replay-score-button').click(function() {
+		$('#score-modal').modal('show');
+	})
 	$('#pass-button').click(clickPass);
 	$('#new-game-button').click(function() {
-		$('#game-finished-modal').modal('hide');
+		$('#score-modal').modal('hide');
 		showNewGamePage();
+	})
+	$('#view-history-button').click(function() {
+		$('#score-modal').modal('hide');
+		showHistoryPage();
 	})
 
 	loadTokenSelectionModal();
@@ -48,6 +56,8 @@ function showGamePage() {
 	$('#game-page').show();
 	$('#logo').show();
 	pageSwitched();
+	replay = false;
+	onGamePage = true;
 	updatePlayerNames();
 }
 
@@ -61,6 +71,7 @@ function showHistoryPage() {
 
 // gets called whenever pages are switched
 function pageSwitched() {
+	onGamePage = false;
 	$('#alert').hide();
 }
 

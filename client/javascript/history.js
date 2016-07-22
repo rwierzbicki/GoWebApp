@@ -4,34 +4,61 @@ var history = {
 	intervalID : null
 }
 
+var replay;
+
 
 function loadGameHistory() {
 	getGameHistory(function callback(data) {
 		$('#game-history-table').empty();
 		var table = document.getElementById('game-history-table');
 		for (var i = data.length-1; i >= 0; i--) {
+
+			var names = {
+				player1: null,
+				player2: null
+			};
+
+			console.log(data[i].player1);
+			console.log(data[i].player2);
+			console.log(Object.keys(data[i]));
+
+			if (data[i].player1 === "anonymous")
+				names.player1 = "Player 1";
+			else
+				names.player1 = data[i].player1;
+
+			if (data[i].gameMode === 1)
+				names.player2 = "CPU";
+			else if (data[i].player2 === "anonymous")
+				names.player2 = "Player 2";
+			else
+				names.player2 = data[i].player2;
+
+			var winnerImg = "<img src='assets/icon_crown.svg' class='winner-icon'></img>   "
+
+			// Table
+
 			var row = table.insertRow(-1);	// insert row at end
 
-			// Date
+			// Cell: Date
 			var cell = row.insertCell();
 			cell.innerHTML = formatDate(new Date(data[i].date));
 
-			// Player 1
+			// Cell: Player 1
 			cell = row.insertCell();
-			cell.innerHTML = data[i].player1;
-
-			// Player 2
-			cell = row.insertCell();
-			if (data[i].gameMode === 1)
-				cell.innerHTML = "CPU";
-			else if (data[i].player2 === "anonymous")
-				cell.innerHTML = "Player 2";
+			if (data[i].finished && (data[i].score1 > data[i].score2))
+				cell.innerHTML = winnerImg + names.player1;
 			else
-				cell.innerHTML = data[i].player2;
+				cell.innerHTML = names.player1;
 
-			// show winner by comparing data[i].score1 and data[i].score2
+			// Cell: Player 2
+			cell = row.insertCell();
+			if (data[i].finished && (data[i].score2 > data[i].score1))
+				cell.innerHTML = winnerImg + names.player2;
+			else
+				cell.innerHTML = names.player2;
 
-			// Replay or continue
+			// Cell: Replay or continue
 			cell = row.insertCell();
 			var button = document.createElement('button');
 			button.setAttribute('gameId', data[i]._id);
@@ -43,6 +70,7 @@ function loadGameHistory() {
 				button.innerHTML = "Continue";
 				button.onclick = clickContinueGame;
 			}
+			cell.className = "center-horizontal";
 			cell.appendChild(button);
 		}
 	});	
@@ -73,11 +101,17 @@ function clickReplayGame(event) {
 		player1.username = data.player1;
 		player2.username = data.player2;
 
+		$('#finished-game-buttons').hide();
+		$('#score-text').html("");
+		populateScoreTable(data.score1, data.score2);
+
 		renderHistoryGameBoard();
 		updateHistoryInfo();
 		showGamePage();
 
 		// has to be after showGamePage()
+		replay = true;
+		$('#score-modal').modal('show');
 		if (data.moveHistory.length > 1){
 			$('#history-controls').show();
 			updateReplayButtons();
